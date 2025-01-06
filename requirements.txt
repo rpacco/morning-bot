@@ -1,0 +1,15 @@
+pandas
+seaborn
+httpx[http2]
+tenacity
+beautifulsoup4
+tweepy
+adjustText
+google-cloud-logging
+google-cloud-storage
+google-cloud-bigquery
+google-cloud-bigquery-storage
+lxml
+matplotlib
+numpy
+db-dtypes

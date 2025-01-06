@@ -1,0 +1,50 @@
+[
+    {
+      "evento": "Estatísticas fiscais",
+      "category": "Resultado primário",
+      "series": [
+        4649,
+        5078
+      ],
+      "colunas": [
+        "MoM",
+        "YoY"
+      ],
+      "multiplicador": -1,
+      "raw": false,
+      "chart": "viz_fiscais",
+      "text": "text_fiscais"
+    },
+    {
+      "evento": "Estatísticas fiscais",
+      "category": "Juros nominais",
+      "series": [
+        4616,
+        5045
+      ],
+      "colunas": [
+        "MoM",
+        "YoY"
+      ],
+      "multiplicador": -1,
+      "raw": false,
+      "chart": "viz_fiscais",
+      "text": "text_fiscais"
+    },
+    {
+      "evento": "Índice de atividade econômica (IBC-Br)",
+      "category": "Prévia do PIB (IBC-BR)",
+      "series": [
+        24364,
+        24363
+      ],
+      "colunas": [
+        "MoM",
+        "YoY"
+      ],
+      "multiplicador": 1,
+      "raw": true,
+      "chart": "viz_pct",
+      "text": "text_pct"
+    }
+  ]
