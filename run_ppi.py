@@ -63,7 +63,8 @@ def run_ppi(logger, logs_df):
             logger.log_text(f"Failed to process data of indicator: {comb} - {str(e)}", severity="ERROR")
             errors.append(f"Failed to process data of indicator: {comb} - {str(e)}")
     
-    upsert_bq_table(PROJECT_ID, DATASET_ID, TABLE_ID, data)
+    if processed_count == 2:
+        upsert_bq_table(PROJECT_ID, DATASET_ID, TABLE_ID, data)
 
     # Format the return value to handle multiple outcomes
     return (
