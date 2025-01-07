@@ -1,6 +1,6 @@
 pandas
 seaborn
-httpx[http2]
+httpx[http2]==0.27.2
 tenacity
 beautifulsoup4
 tweepy
