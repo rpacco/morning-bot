@@ -20,11 +20,18 @@ def run_bcb(logs_df, logger = None):
 
     cat_bcb = pd.read_json('src/bcb/cat_bcb.json')
 
-    calendar_df = bcb_calendar('mes', logger=logger)
+    try:
+        calendar_df = bcb_calendar('mes', logger=logger)
+        if calendar_df is not None:
+            df = calendar_df.merge(cat_bcb, on='evento')
+        else:
+            logger.log_text("BCB calendar returned None", severity="WARNING")
+            df = pd.DataFrame()  # Empty DataFrame if calendar_df is None
+    except Exception as e:
+        logger.log_text(f"Error fetching or merging BCB calendar: {str(e)}", severity="ERROR")
+        df = pd.DataFrame()  # Empty DataFrame if an exception occurs
 
-    df = calendar_df.merge(cat_bcb, on='evento')
-
-    if df is None or df.empty:
+    if df.empty:
         logger.log_text("BCB scheduler returned no data.", severity="WARNING")
         return "No BCB data to process"
 
