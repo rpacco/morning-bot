@@ -6,11 +6,11 @@ from io import BytesIO
 def wrangle(df):
     # Define the patterns and their corresponding names
     def map_column(col):
-        col_lower = col.lower()  # Convert column name to lowercase for case-insensitive matching
-        if 'mês' in col_lower or 'mensal' in col_lower:
-            return 'Variação mensal'
-        elif '12 meses' in col_lower:
+        col_lower = col.lower()
+        if any(item in col_lower for item in ['12 meses', 'ano anterior']):
             return 'Variação acumulada em 12 meses'
+        elif 'mês' in col_lower or 'mensal' in col_lower:
+            return 'Variação mensal'
         else:
             return col  # Return the original column name if no pattern matches
 
