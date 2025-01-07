@@ -35,10 +35,10 @@ def run_ppi(logger, logs_df):
     already_tweeted = []
 
     for comb in combs:
-        # if comb in logs_df['indicator'].values:
-        #     logger.log_text(f"Indicator already tweeted: {comb}", severity="INFO")
-        #     already_tweeted.append(comb)
-        #     continue
+        if comb in logs_df['indicator'].values:
+            logger.log_text(f"Indicator already tweeted: {comb}", severity="INFO")
+            already_tweeted.append(comb)
+            continue
 
         try:
             if df_updated.empty or df_updated.index[-1].date() != today:
