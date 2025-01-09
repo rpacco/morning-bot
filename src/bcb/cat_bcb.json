@@ -46,5 +46,19 @@
       "raw": true,
       "chart": "viz_pct",
       "text": "text_pct"
+    },
+    {
+      "evento": "Estatísticas do setor externo",
+      "category": "Fluxo cambial mensal",
+      "series": [
+        13961
+      ],
+      "colunas": [
+        "fluxo_cambial_mensal"
+      ],
+      "multiplicador": 0.001,
+      "raw": true,
+      "chart": "viz_cambio",
+      "text": "text_cambio"
     }
   ]

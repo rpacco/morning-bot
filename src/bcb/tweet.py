@@ -25,6 +25,19 @@ def text_pct(df, name):
 
     return tweet_text
 
+def text_cambio(df, name):
+    monthly_data = df.resample('ME').sum().iloc[-13:]
+    ref = df.index[-1]
+    tweet_text = f'\U0001F4B8 {name}, até {ref.date().strftime("%d-%m-%Y")}:\n\n'
+    value = monthly_data.iloc[-1].values[0]
+    if value > 0:
+            tweet_text += f"\U0001F7E2 Entrada de US$ {value/1000:.2f} BI.\n"
+    else:
+        tweet_text += f"\U0001F534 Saída de US$ {value/1000:.2f} BI.\n"
+            
+    tweet_text += "\nFonte: @BancoCentralBR"
+
+
 def create_tweet(text, image_path, image_buffer):
     # Retrieve environment variables
     consumer_key = os.environ.get("CONSUMER_KEY")

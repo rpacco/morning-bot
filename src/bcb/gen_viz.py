@@ -137,7 +137,67 @@ def viz_pct(df, name):
     plt.tight_layout()
     plt.subplots_adjust(top=0.9, bottom=0.15)
 
-    # plt.savefig(f'{name}.jpg', dpi=dpi, bbox_inches='tight')
+    # Save the plot to a BytesIO object
+    img_buffer = BytesIO()
+    plt.savefig(img_buffer, format='jpg', bbox_inches='tight')
+    img_buffer.seek(0)  # Move the cursor to the beginning of the BytesIO object
+
+    # Return the BytesIO object
+    return img_buffer
+
+def viz_cambio(df, name):
+    data = df.resample('ME').sum().iloc[-13:].reset_index()
+    data.columns = ['date', 'valor']
+
+    dpi = 100
+    figsize_inches = (1024 / dpi, 762 / dpi)
+    fig, ax = plt.subplots(figsize=figsize_inches, dpi=dpi)
+    fig.patch.set_facecolor('#F7F7F7')
+
+    sns.barplot(data=data, x='date', y='valor', hue='date', 
+                palette=['firebrick' if x < 0 else 'mediumblue' for x in data['valor']], 
+                legend=False, ax=ax)
+
+    ax.set_frame_on(False)
+    ax.set_xticks(range(len(data['date'])))
+    ax.set_xticklabels(data['date'].dt.strftime('%b/%y'), ha='center', fontdict={'size':12})
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+    ax.tick_params(axis='x', which='both', length=0)
+    ax.get_yaxis().set_visible(False)
+
+    # Annotate bars
+    for bar in ax.patches:
+        height = bar.get_height()
+        if height >= 0:
+            ax.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{height:.2f}', 
+                    ha='center', va='bottom', color='black', fontsize=13)
+        else:
+            ax.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{height:.2f}', 
+                    ha='center', va='top', color='black', fontsize=13)
+            
+    ax.text(
+        x=0.03,
+        y=1.05,
+        s="Fluxo cambial mensal", 
+        fontsize=32, 
+        fontweight="bold",
+        ha="left",
+        transform=ax.transAxes
+    )
+    ax.text(
+        x=0.03, 
+        y=1.01,
+        s="(em bilhões de US$) Fonte: BCB", 
+        fontsize=12, 
+        alpha=0.75,
+        ha="left",
+        transform=ax.transAxes
+    )
+
+    plt.tight_layout()
     # Save the plot to a BytesIO object
     img_buffer = BytesIO()
     plt.savefig(img_buffer, format='jpg', bbox_inches='tight')
