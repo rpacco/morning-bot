@@ -32,6 +32,7 @@ def run_ibge(logger, logs_df):
         table = row['table']
         v = row['v']
         d = row['d']
+        subtitle = row['subtitle']
         
         logger.log_text(f"Running IBGE crawler for {name}", severity="INFO")
         try:
@@ -42,7 +43,7 @@ def run_ibge(logger, logs_df):
                 logger.log_text(f"No data returned for cleaning for {name}", severity="WARNING")
                 continue
 
-            twt_text = gen_text(df_clean, f"{title} - {name}")
+            twt_text = gen_text(df_clean, f"{name}")
             chart = gen_chart(df_clean, name)
             create_tweet(twt_text, image_path=f"{name}", image_buffer=chart)
             chart.close()

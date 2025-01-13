@@ -1,10 +1,9 @@
-indicator,table,v,d,name
-Índice Nacional de Preços ao Consumidor,"1736","44,2292","d/v44%202,v2292%202","INPC"
-Índice Nacional de Preços ao Consumidor Amplo,"1737","63,2265","d/v63%202,v2265%202","IPCA"
-Índice Nacional de Preços ao Consumidor Amplo 15,"3065","355,1120","d/v355%202,v1120%202","IPCA-15"
-Índice de Preços ao Produtor - Indústrias Extrativas e de Transformação,"6903","1394,1396","c842/46608/d/v1394%202,v1396%202","IPP"
+indicator,table,v,d,name,subtitle
+Índice Nacional de Preços ao Consumidor Amplo,"1737","63,2265","d/v63%202,v2265%202","Inflação: IPCA","Índice Nacional de Preços ao Consumidor Amplo"
+Índice Nacional de Preços ao Consumidor Amplo 15,"3065","355,1120","d/v355%202,v1120%202","Inflação: IPCA-15","Índice Nacional de Preços ao Consumidor Amplo 15"
+Índice de Preços ao Produtor - Indústrias Extrativas e de Transformação,"6903","1394,1396","c842/46608/d/v1394%202,v1396%202","Índice de Preços ao Produtor","Indústrias Extrativas e de Transformação"
 pnadc,"6381","4099","d/v4099%201",""
-Pesquisa Mensal de Comércio,"8880","11708,11711","c11046/56734/d/v11708%201,v11711%201","PMC - volume de vendas"
-Pesquisa Mensal de Serviços,"5906","11623,11626","c11046/56726/d/v11623%201,v11626%201","PMS - volume de serviços"
-Pesquisa Industrial Mensal: Produção Física - Brasil,"8888","11601,11604","c544/129314/d/v11601%201,v11604%201","PIM - Indústria Geral"
-PIB,"5932","6562,6564","c11255/90707/d/v6562%201,v6564%201","PIB - volume trimestral"
+Pesquisa Mensal de Comércio,"8880","11708,11711","c11046/56734/d/v11708%201,v11711%201","Pesquisa Mensal de Comércio","Volume de vendas"
+Pesquisa Mensal de Serviços,"5906","11623,11626","c11046/56726/d/v11623%201,v11626%201","Pesquisa Mensal de Serviços","Volume de serviços"
+Pesquisa Industrial Mensal: Produção Física - Brasil,"8888","11601,11604","c544/129314/d/v11601%201,v11604%201","Pesquisa Industrial Mensal","Produção Física - Brasil"
+PIB,"5932","6562,6564","c11255/90707/d/v6562%201,v6564%201","Produto Interno Bruto- PIB","Volume trimestral"

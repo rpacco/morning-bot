@@ -21,11 +21,10 @@ def wrangle(df):
     
     return df
 
-def gen_chart(df, name):
+def gen_chart(df, name, subtitle):
     dpi = 100
     figsize_inches = (1024 / dpi, 762 / dpi)
     fig = plt.figure(figsize=figsize_inches, dpi=dpi)
-    fig.patch.set_facecolor('#F7F7F7')
 
     bar_width = 0.4
     x_positions = np.arange(len(df))
@@ -37,6 +36,7 @@ def gen_chart(df, name):
     plt.xticks(ticks=x_positions, labels=[x.strftime("%b/%y") for x in df.index], size=14, color='darkslategray')
     plt.ylabel('')
     plt.yticks([])
+    plt.tick_params(axis='x', length=0, width=0)
 
     for index, (value_mm, value_12mm) in enumerate(zip(df['Variação mensal'], df['Variação acumulada em 12 meses'])):
         plt.text(index - bar_width/2, value_mm, f'{value_mm:.2f}', ha='center', va='bottom' if value_mm >= 0 else 'top', fontsize=12, color='darkslategray')
@@ -46,19 +46,30 @@ def gen_chart(df, name):
     for label in ax.get_xticklabels():
         label.set_horizontalalignment('center')
 
-    plt.figtext(
-        0.5, 0.98, f'{name}', ha='center',
-        fontsize=44, fontweight='demibold', color='darkslategray', family='serif'
+    # Add title and subtitle
+    plt.text(
+        x=0, 
+        y=1.18,  
+        s=f"{name}", 
+        fontsize=36, 
+        fontweight="bold",
+        ha="left",
+        transform=plt.gca().transAxes  
+    )
+    plt.text(
+        x=0, 
+        y=1.13,  
+        s=f"{subtitle}. Fonte: IBGE", 
+        fontsize=16, 
+        ha="left",
+        transform=plt.gca().transAxes  
     )
 
-    plt.grid(True, axis='y', color='gainsboro', linewidth=1.5)
-
-    ax.spines['top'].set(edgecolor='gainsboro', linewidth=2)
-    ax.spines['right'].set(edgecolor='gainsboro', linewidth=2)
-    ax.spines['left'].set(edgecolor='gainsboro', linewidth=2)
-    ax.spines['bottom'].set(edgecolor='gainsboro', linewidth=2)
-
-    plt.figtext(0.01, 0.05, 'Fonte: IBGE.', fontsize=14, color='darkslategray')
+    # Remove borders
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
 
     legend_handles = [
         mlines.Line2D([], [], marker='s', markersize=15, linestyle='None', color='w', markerfacecolor='royalblue', label='% MoM'),
