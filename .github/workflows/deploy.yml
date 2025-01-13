@@ -34,6 +34,6 @@ jobs:
           --set-env-vars="DATASET_ID=${{ secrets.DATASET_ID }},PROJECT_ID=${{ secrets.PROJECT_ID }},TABLE_ID=${{ secrets.TABLE_ID }},LOG_EXECUTION_ID=${{ secrets.LOG_EXECUTION_ID }},CONSUMER_KEY=${{ secrets.CONSUMER_KEY }},CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET }},ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }},ACCESS_SECRET=${{ secrets.ACCESS_SECRET }},BEARER_TOKEN=${{ secrets.BEARER_TOKEN }}" \
           --service-account=86383374932-compute@developer.gserviceaccount.com \
           --memory=1Gi \
-          --cpu=333m \
-          --max-instances=5 \
+          --cpu=583m \
+          --max-instances=2 \
           --timeout=60s

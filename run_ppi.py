@@ -18,7 +18,7 @@ def run_ppi(logger, logs_df):
     start_date = today - timedelta(5)
     crawler = PpiCrawler(start_date)
     data = crawler.run()
-    combs = ['diesel_brl', 'gasolina_brl']
+    combs = ['diesel_pct', 'gasolina_pct']
     
     if data is None:
         logger.log_text("ABICOM PPI crawler returned no data.", severity="WARNING")
