@@ -14,8 +14,9 @@ def currency_formatter(x, pos):
     return f'{x:.2f}'  # Format numbers as currency
 
 def wrangle(df: pd.DataFrame, combustivel: str):
+    df = df.dropna()
     df['year_ma'] = round(df[combustivel].rolling(252).mean(), 2)
-    df = df[[combustivel, 'year_ma']].dropna(how='any')
+    df = df[[combustivel, 'year_ma']]
     
     return df
 
@@ -63,7 +64,7 @@ def gen_graph(df, combustivel):
     # Format x-axis
     date_format = mdates.DateFormatter('%b-%y')
     plt.gca().xaxis.set_major_formatter(date_format)
-    plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=len(df.index)))
+    plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=15))
     plt.xticks(size=12)
     plt.xlabel('')
 
@@ -110,7 +111,7 @@ def gen_graph(df, combustivel):
     )
     adjust_text([last_comb_value, last_ma_value], only_move={'text': 'y'})
     last_ma_value.set_position((last_ma_value.get_position()[0] + 7, last_ma_value.get_position()[1]))
-    last_comb_value.set_position((last_comb_value.get_position()[0] + 4, last_comb_value.get_position()[1]))
+    last_comb_value.set_position((last_comb_value.get_position()[0] + 7, last_comb_value.get_position()[1]))
 
     # Annotate smallest and largest values
     for value, date in zip(nsmallest.values, nsmallest.index):
@@ -132,9 +133,9 @@ def gen_graph(df, combustivel):
     # Remove ticks
     plt.tick_params(axis='x', length=0, width=0)
     # Set x-axis to start at y=0
-    ax.set_xlim(left=df.index[0], right=df.index[-1] + pd.Timedelta(days=1))
+    ax.set_xlim(left=df.index[0], right=df.index[-1])
     # Finalize plot
-    plt.tight_layout()
+    plt.tight_layout(rect=(0, 0, 1.1, 1))
 
     img_buffer = BytesIO()
     plt.savefig(img_buffer, format='jpg', bbox_inches='tight')
@@ -150,7 +151,7 @@ def gen_text(df, combustivel):
 
     # Check the condition and create the text
     text = (
-        f'{red_circle if df[combustivel].values[-1] < 0 else green_circle} Defasagem média {combustivel.split("_")[0].upper()} em {today.strftime("%d/%m/%Y")}: {df[combustivel].values[-1]:.2f} %.\n'
+        f'{red_circle if df[combustivel].values[-1] < 0 else green_circle} Defasagem média {combustivel.split("_")[0].upper()} em {today.strftime("%d/%m/%Y")}: {int(df[combustivel].values[-1])} %.\n'
         f'Defasagem média anual: {df["year_ma"].values[-1]:.2f} %.\n'
         'Fonte: ABICOM'
       )
