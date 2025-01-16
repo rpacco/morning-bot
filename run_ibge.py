@@ -44,7 +44,7 @@ def run_ibge(logger, logs_df):
                 continue
 
             twt_text = gen_text(df_clean, f"{name}")
-            chart = gen_chart(df_clean, name)
+            chart = gen_chart(df_clean, name, subtitle)
             create_tweet(twt_text, image_path=f"{name}", image_buffer=chart)
             chart.close()
             
