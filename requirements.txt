@@ -1,4 +1,5 @@
 pandas
+openpyxl
 seaborn
 httpx[http2]==0.27.2
 tenacity
