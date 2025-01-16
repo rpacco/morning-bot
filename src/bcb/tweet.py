@@ -31,9 +31,9 @@ def text_cambio(df, name):
     tweet_text = f'\U0001F4B8 {name}, até {ref.date().strftime("%d-%m-%Y")}:\n\n'
     value = monthly_data.iloc[-1].values[0]
     if value > 0:
-            tweet_text += f"\U0001F7E2 Entrada de US$ {value/1000:.2f} BI.\n"
+            tweet_text += f"\U0001F7E2 Entrada de US$ {value:.2f} BI.\n"
     else:
-        tweet_text += f"\U0001F534 Saída de US$ {value/1000:.2f} BI.\n"
+        tweet_text += f"\U0001F534 Saída de US$ {value:.2f} BI.\n"
             
     tweet_text += "\nFonte: @BancoCentralBR"
 

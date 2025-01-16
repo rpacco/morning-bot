@@ -57,6 +57,7 @@ def run_bcb(logs_df, logger = None):
         raw = row['raw']
         chart = row['chart']
         text = row['text']
+        subtitle = row['subtitle']
         
         logger.log_text(f"Running BCB crawler for {name}", severity="INFO")
         try:
@@ -69,7 +70,7 @@ def run_bcb(logs_df, logger = None):
             gen_text = txt_functions.get(text)
             gen_viz_bcb = viz_functions.get(chart)
             twt_text = gen_text(df, name)
-            chart = gen_viz_bcb(df, name)
+            chart = gen_viz_bcb(df, name, subtitle)
             create_tweet(twt_text, image_path=f"{name}", image_buffer=chart)
             chart.close()
             

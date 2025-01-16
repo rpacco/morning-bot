@@ -2,6 +2,7 @@
     {
       "evento": "Estatísticas fiscais",
       "category": "Resultado primário",
+      "subtitle": "(em bilhões de R$)",
       "series": [
         4649,
         5078
@@ -18,6 +19,7 @@
     {
       "evento": "Estatísticas fiscais",
       "category": "Juros nominais",
+      "subtitle": "(em bilhões de R$)",
       "series": [
         4616,
         5045
@@ -34,6 +36,7 @@
     {
       "evento": "Índice de atividade econômica (IBC-Br)",
       "category": "Prévia do PIB (IBC-BR)",
+      "subtitle": "Índice de Atividade Econômica do Banco Central (IBC-Br)",
       "series": [
         24364,
         24363
@@ -50,6 +53,7 @@
     {
       "evento": "Estatísticas do setor externo",
       "category": "Fluxo cambial mensal",
+      "subtitle": "(em bilhões de US$)",
       "series": [
         13961
       ],

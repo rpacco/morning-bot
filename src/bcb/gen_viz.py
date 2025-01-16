@@ -5,37 +5,59 @@ import matplotlib.lines as mlines
 from matplotlib.ticker import FuncFormatter
 from io import BytesIO
 import numpy as np
+from adjustText import adjust_text
 
 
 def billions(x, pos):
     """The two args are the value and tick position"""
     return f'R${x/1e3:.1f}B'
 
-def viz_fiscais(df, name):
-    dpi = 100
-    figsize_inches = (1024 / dpi, 762 / dpi)
-
-    df = df.loc['2023':].copy()
+def viz_fiscais(df, name, subtitle):
+    df = df.iloc[-12:,].copy()
     df['month'] = df.index.strftime('%b/%y')
+    
+    dpi = 100
+    figsize_inches = (1024 / dpi, 762 / dpi)  
 
     # Set up the matplotlib figure
     fig, ax1 = plt.subplots(figsize=figsize_inches, dpi=dpi)
-    fig.patch.set_facecolor('#F7F7F7')
 
     # Create the barplot for monthly data on the first y-axis
-    bars = sns.barplot(x='month', y='MoM', data=df, color='steelblue', legend=False, alpha=0.6, ax=ax1)
+    bars = sns.barplot(x='month', y='Monthly', data=df, color='steelblue', legend=False, alpha=0.6, ax=ax1)
 
     # Create a second y-axis for the TTM data
     ax2 = ax1.twinx()
 
     # Create the lineplot for TTM data on the second y-axis
-    sns.lineplot(x='month', y='YoY', data=df, color='darkblue', marker='o', legend=False, ax=ax2)
-
+    sns.lineplot(x='month', y='TTM', data=df, color='darkblue', marker='o', linestyle='--', legend=False, ax=ax2)
 
     # Rotate x-axis labels by 90 degrees
     for tick in ax1.get_xticklabels():
-        tick.set_rotation(90)
         tick.set_ha('center')  # Center-align the label text
+
+    # Annotate the barplot
+    texts = []
+    for bar in bars.patches:
+        height = bar.get_height()
+        x_pos = bar.get_x() + bar.get_width() / 2
+        text = ax1.text(x_pos, height, f'{height/1000:.2f}', 
+                        ha='center', va= 'bottom' if height > 0 else 'top', color='steelblue', fontsize=10)
+        texts.append(text)
+
+    # Annotate the lineplot
+    line_texts = []
+    for i, (x, y) in enumerate(zip(df['month'], df['TTM'])):
+        # Use ax2 for TTM data annotations
+        text = ax2.text(i, y, f'{y/1000:.2f}', 
+                        ha='center', va='bottom', fontsize=10)
+        line_texts.append(text)
+
+    # Create a smooth curve to guide the adjustment of the text labels
+    x = np.linspace(0, len(df) - 1, 300)
+    y = np.interp(x, range(len(df)), df['TTM'])
+
+    # Adjust lineplot annotations to avoid overlap
+    adjust_text(line_texts, x=x, y=y)
 
     # Manually add y-axis labels at the top
     ax1.yaxis.label.set_visible(False)  # Hide default label
@@ -43,12 +65,14 @@ def viz_fiscais(df, name):
     ax2.yaxis.label.set_visible(False)  # Hide default label
 
     # Add custom labels at the top
-    ax1.text(0, 1.05, 'Último mês\n(bilhões R$)', transform=ax1.transAxes, ha='right', va='center', color='steelblue', fontsize=11)
-    ax2.text(1, 1.05, 'Últimos 12 meses\n(bilhões R$)', transform=ax2.transAxes, ha='left', va='center', color='darkblue', fontsize=11)
+    ax1.text(0, 1.0, 'Último mês\n', transform=ax1.transAxes, ha='right', va='center', color='steelblue', fontsize=14)
+    ax2.text(1, 1.0, 'Acumulado\n12 meses\n', transform=ax2.transAxes, ha='left', va='center', color='darkblue', fontsize=14)
 
     # Setting the ticks color to match the plot
-    ax1.tick_params(axis='y', labelcolor='steelblue', labelsize=12)
-    ax2.tick_params(axis='y', labelcolor='darkblue', labelsize=12)
+    ax1.tick_params(axis='y', labelcolor='steelblue', labelsize=14)
+    ax2.tick_params(axis='y', labelcolor='darkblue', labelsize=14)
+    ax1.tick_params(axis='x', labelsize=14, rotation=30)
+    ax2.tick_params(axis='x', labelsize=14, rotation=30)
 
     # Format y-axis labels as currency in billions
     formatter = FuncFormatter(billions)
@@ -59,21 +83,37 @@ def viz_fiscais(df, name):
     ax1.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
     ax2.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
 
-    plt.figtext(
-        0.5, 0.98, f'{name}', ha='center',
-        fontsize=44, fontweight='demibold', color='darkslategray', family='serif'
+    # Remove borders
+    ax1.spines['top'].set_visible(False)
+    ax2.spines['top'].set_visible(False)
+
+    # Add title and subtitle
+    plt.text(
+        x=-0.1, 
+        y=1.2,  
+        s=f"{name}", 
+        fontsize=40, 
+        fontweight="bold",
+        ha="left",
+        transform=plt.gca().transAxes  
+    )
+    plt.text(
+        x=-0.1, 
+        y=1.13,  
+        s=f"{subtitle}. Fonte: BCB", 
+        fontsize=18, 
+        ha="left",
+        transform=plt.gca().transAxes  
     )
 
-    plt.figtext(0.98, 0.03, 'Fonte: BCB.', fontsize=14, color='darkslategray', ha='right')
-
     legend_handles = [
-        mlines.Line2D([], [], marker='s', markersize=15, linestyle='None', color='w', markerfacecolor='steelblue', label='Mensal'),
-        mlines.Line2D([], [], marker='s', markersize=15, linestyle='None', color='w', markerfacecolor='darkblue', label='Acumulado 12 meses')
+        mlines.Line2D([], [], marker='s', markersize=15, linestyle='None', color='w', alpha=0.6, markerfacecolor='steelblue', label='Mensal'),
+        mlines.Line2D([], [], marker='o', markersize=8, linestyle='--', color='darkblue', markerfacecolor='darkblue', label='Acumulado 12 meses')
     ]
 
-    plt.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5, 1.08), ncol=2, frameon=False, prop={'size': 14})
+    plt.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5, 1.12), ncol=2, frameon=False, prop={'size': 16})
 
-    plt.subplots_adjust(top=1.1, bottom=0.15, left=0, right=1)
+    # Show the plot
     plt.tight_layout()
 
     # plt.savefig(f'{name}.jpg', dpi=dpi, bbox_inches='tight')
@@ -86,11 +126,10 @@ def viz_fiscais(df, name):
     return img_buffer
 
 
-def viz_pct(df, name):
+def viz_pct(df, name, subtitle):
     dpi = 100
     figsize_inches = (1024 / dpi, 762 / dpi)
     fig = plt.figure(figsize=figsize_inches, dpi=dpi)
-    fig.patch.set_facecolor('#F7F7F7')
 
     df = df.iloc[-13:,]
 
@@ -104,6 +143,7 @@ def viz_pct(df, name):
     plt.xticks(ticks=x_positions, labels=[x.strftime("%b/%y") for x in df.index], size=14, color='darkslategray')
     plt.ylabel('')
     plt.yticks([])
+    plt.tick_params(axis='x', length=0, width=0)
 
     for index, (value_mm, value_12mm) in enumerate(zip(df['MoM'], df['YoY'])):
         plt.text(index - bar_width/2, value_mm, f'{value_mm:.2f}', ha='center', va='bottom' if value_mm >= 0 else 'top', fontsize=12, color='darkslategray')
@@ -113,19 +153,35 @@ def viz_pct(df, name):
     for label in ax.get_xticklabels():
         label.set_horizontalalignment('center')
 
-    plt.figtext(
-        0.5, 0.98, f'{name}', ha='center',
-        fontsize=44, fontweight='demibold', color='darkslategray', family='serif'
+    # Add title and subtitle
+    plt.text(
+        x=0, 
+        y=1.18,  
+        s=f"{name}", 
+        fontsize=36, 
+        fontweight="bold",
+        ha="left",
+        transform=plt.gca().transAxes  
+    )
+    plt.text(
+        x=0, 
+        y=1.13,  
+        s=f"{subtitle}. Fonte: BCB", 
+        fontsize=16, 
+        ha="left",
+        transform=plt.gca().transAxes  
     )
 
-    plt.grid(True, axis='y', color='gainsboro', linewidth=1.5)
+    # Remove borders
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
 
-    ax.spines['top'].set(edgecolor='gainsboro', linewidth=2)
-    ax.spines['right'].set(edgecolor='gainsboro', linewidth=2)
-    ax.spines['left'].set(edgecolor='gainsboro', linewidth=2)
-    ax.spines['bottom'].set(edgecolor='gainsboro', linewidth=2)
-
-    plt.figtext(0.01, 0.05, 'Fonte: Banco Central do Brasil.', fontsize=14, color='darkslategray')
+    legend_handles = [
+        mlines.Line2D([], [], marker='s', markersize=15, linestyle='None', color='w', markerfacecolor='royalblue', label='% MoM'),
+        mlines.Line2D([], [], marker='s', markersize=15, linestyle='None', color='w', markerfacecolor='orange', label='% YoY')
+    ]
 
     legend_handles = [
         mlines.Line2D([], [], marker='s', markersize=15, linestyle='None', color='w', markerfacecolor='royalblue', label='% MoM'),
@@ -145,7 +201,8 @@ def viz_pct(df, name):
     # Return the BytesIO object
     return img_buffer
 
-def viz_cambio(df, name):
+def viz_cambio(df, name, subtitle):
+    last_date = df.index[-1].date().strftime('%d/%m/%Y')
     data = df.resample('ME').sum().iloc[-13:].reset_index()
     data.columns = ['date', 'valor']
 
@@ -181,7 +238,7 @@ def viz_cambio(df, name):
     ax.text(
         x=0.03,
         y=1.05,
-        s="Fluxo cambial mensal", 
+        s=f"{name}", 
         fontsize=32, 
         fontweight="bold",
         ha="left",
@@ -190,7 +247,7 @@ def viz_cambio(df, name):
     ax.text(
         x=0.03, 
         y=1.01,
-        s="(em bilhões de US$) Fonte: BCB", 
+        s=f"acumulado até {last_date} {subtitle}. Fonte: BCB", 
         fontsize=12, 
         alpha=0.75,
         ha="left",
