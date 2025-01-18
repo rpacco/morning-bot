@@ -37,16 +37,13 @@ def run_fgv_scheduler(logger, logs_df):
         try:
             spider = FGVSpider(serie=codes, columns=ct_titles, logger=logger, ref_date=ref_date)
             result_df = spider.run()
-            if result_df is None:
+            if result_df is None or result_df.empty:
                 logger.log_text(f"Spider returned no data for {title}", severity="WARNING")
                 spider_no_data += 1
                 continue
 
-            result_df.name = title
-            result_df.to_csv('monitor_pib.csv')
-
             try:
-                twt_text = gen_text(result_df)
+                twt_text = gen_text(result_df, title)
                 print(twt_text)
                 img_buff = chart_viz(result_df, title, logger)
                 create_tweet(text=twt_text, image_path=f"{title}", image_buffer=img_buff)
