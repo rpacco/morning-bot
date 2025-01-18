@@ -1,12 +1,12 @@
 import tweepy
 import os
 
-def gen_text(df):
+def gen_text(df, title):
     columns_lower = [x.lower() for x in df.columns]
     if any('pib' in col for col in columns_lower):
-        tweet_text = f'## {df.name}, referência {df.index[-1].date().strftime("%m-%Y")}:\n'
-        var_mom = df.pct_change(1).iloc[-1]
-        var_yoy = ((df.rolling(12).sum() / df.shift(12).rolling(12).sum()) - 1)*100
+        tweet_text = f'## {title}, referência {df.index[-1].date().strftime("%m-%Y")}:\n'
+        var_mom = df['PIB a preços de mercado com ajuste sazonal'].pct_change(1).iloc[-1]
+        var_yoy = (((df['PIB a preços de mercado'].rolling(12).sum() / df['PIB a preços de mercado'].shift(12).rolling(12).sum()) - 1)).iloc[-1]
         if var_mom > 0:
             tweet_text += f"\U0001F4C8 Alta de {var_mom:.2%} M/M.\n"
         else:
@@ -21,7 +21,7 @@ def gen_text(df):
     else:
         var_mm = df.pct_change().iloc[-1,:].sort_values(ascending=False)
         # Assuming df and var_mm are already defined
-        tweet_text = f'## {df.name}, referência {df.index[-1].date().strftime("%m-%Y")}:\n'
+        tweet_text = f'## {title}, referência {df.index[-1].date().strftime("%m-%Y")}:\n'
         for col, value in var_mm.items():
             if value > 0:
                 tweet_text += f"\U0001F4C8 {col.strip()}, alta de {value:.2%} M/M.\n"
