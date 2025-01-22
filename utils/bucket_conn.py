@@ -1,6 +1,6 @@
 from google.cloud import storage
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import io
 
 def logs_conn():
@@ -8,7 +8,7 @@ def logs_conn():
     client = storage.Client()
 
     bucket_name = 'tt-bot'
-    file_name = f'tweeted-logs/{today}.csv'
+    file_name = f'tweeted-logs/{today.strftime("%Y-%m")}/{today}.csv'
 
     bucket = client.get_bucket(bucket_name)
     blob = bucket.blob(file_name)
@@ -19,10 +19,46 @@ def logs_conn():
     except Exception as e:
         print(f"File does not exist or an error occurred: {e}")
         df = pd.DataFrame(columns=["source", "indicator", "posted"])
+        
+        # Create the intermediate directory if it does not exist
+        intermediate_dir = f'tweeted-logs/{today.strftime("%Y-%m")}/'
+        bucket.blob(intermediate_dir).upload_from_string('', content_type='application/x-directory')
+        
         blob.upload_from_string(df.to_csv(index=False), content_type='text/csv')
         print(f"Created new CSV file: {file_name}")
 
     return df
+
+def logs_conn_monthly():
+    today = datetime.today().date()
+    client = storage.Client()
+
+    bucket_name = 'tt-bot'
+    bucket = client.get_bucket(bucket_name)
+
+    # Initialize an empty DataFrame
+    df_monthly = pd.DataFrame(columns=["source", "indicator", "posted"])
+
+    # Get the prefix for the current month
+    prefix = f'tweeted-logs/{today.strftime("%Y-%m")}/'
+
+    # Create the intermediate directory if it does not exist
+    intermediate_dir = prefix
+    bucket.blob(intermediate_dir).upload_from_string('', content_type='application/x-directory')
+
+    # Get a list of blobs in the bucket with the prefix
+    blobs = list(bucket.list_blobs(prefix=prefix))
+
+    # Loop through each blob
+    for blob in blobs:
+        try:
+            csv_content = blob.download_as_text()
+            df = pd.read_csv(io.StringIO(csv_content))
+            df_monthly = pd.concat([df_monthly, df], ignore_index=True)
+        except Exception as e:
+            print(f"File does not exist or an error occurred: {e}")
+
+    return df_monthly
 
 def update_logs_conn(df):
     """
@@ -35,7 +71,7 @@ def update_logs_conn(df):
     client = storage.Client()
 
     bucket_name = 'tt-bot'
-    file_name = f'tweeted-logs/{today}.csv'
+    file_name = f'tweeted-logs/{today.strftime("%Y-%m")}/{today}.csv'
 
     bucket = client.get_bucket(bucket_name)
     blob = bucket.blob(file_name)

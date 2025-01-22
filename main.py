@@ -1,9 +1,9 @@
 from utils.bucket_conn import logs_conn, update_logs_conn
-from run_fgv import run_fgv_scheduler
-from run_ibge import run_ibge
-from run_bcb import run_bcb
-from run_ppi import run_ppi
-from run_anfavea import run_anfa
+from src.run_fgv import run_fgv_scheduler
+from src.run_ibge import run_ibge
+from src.run_bcb import run_bcb
+from src.run_ppi import run_ppi
+from src.run_anfavea import run_anfa
 from google.cloud import logging as gcp_logging
 
 # Set up Google Cloud Logging
