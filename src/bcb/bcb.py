@@ -53,8 +53,8 @@ def get_bc_serie(series: list, name: str, colunas: list, reference: datetime.dat
         
         df_merged.set_index('data', drop=True, inplace=True)
         df_merged.columns = colunas
-        df_merged['MoM'] = pd.to_numeric(df_merged['MoM'], errors='coerce')
-        df_merged['YoY'] = pd.to_numeric(df_merged['YoY'], errors='coerce')
+        for col in df_merged.columns:
+            df_merged[col] = pd.to_numeric(df_merged[col], errors='coerce')
         df_merged = df_merged * multiplicador
         df_merged.name = name
         

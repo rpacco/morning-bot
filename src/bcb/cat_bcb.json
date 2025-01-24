@@ -51,7 +51,7 @@
       "text": "text_pct"
     },
     {
-      "evento": "Estatísticas do setor externo",
+      "evento": "Estatísticas monetárias e de crédito",
       "category": "Fluxo cambial mensal",
       "subtitle": "(em bilhões de US$)",
       "series": [
@@ -64,5 +64,39 @@
       "raw": true,
       "chart": "viz_cambio",
       "text": "text_cambio"
+    },
+    {
+      "evento": "Estatísticas do setor externo",
+      "category": "Transações correntes",
+      "subtitle": "Saldo mensal (em bilhões de US$)",
+      "series": [
+        22701,
+        24419
+      ],
+      "colunas": [
+        "MoM",
+        "YoY"
+      ],
+      "multiplicador": 1,
+      "raw": false,
+      "chart": "viz_externo",
+      "text": "text_fiscais"
+    },
+    {
+      "evento": "Estatísticas do setor externo",
+      "category": "Investimentos diretos no país",
+      "subtitle": "Saldo mensal (em bilhões de US$)",
+      "series": [
+        22885,
+        24422
+      ],
+      "colunas": [
+        "MoM",
+        "YoY"
+      ],
+      "multiplicador": 1,
+      "raw": false,
+      "chart": "viz_externo",
+      "text": "text_fiscais"
     }
   ]

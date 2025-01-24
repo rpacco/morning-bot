@@ -2,8 +2,8 @@ import tweepy
 import os
 
 
-def text_fiscais(df, name):
-    tweet_text = f'## {name}, referência {df.index[-1].date().strftime("%m-%Y")}:\n\n'
+def text_fiscais(df, name, subtitle):
+    tweet_text = f'## {name} - {subtitle}, referência {df.index[-1].date().strftime("%m-%Y")}:\n\n'
     dict_var = {'MoM': 'Mensal', 'YoY': 'Últimos 12 meses'}
     for col, value in df.iloc[-1,].items():
         tweet_text += f"# {dict_var[col]} = {value/1000:.2f} BI\n"
