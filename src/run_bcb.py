@@ -2,7 +2,7 @@ import pandas as pd
 from src.bcb.bcb_sched import bcb_calendar
 from src.bcb.bcb import get_bc_serie
 from src.bcb.tweet import text_fiscais, text_pct, text_cambio, create_tweet
-from src.bcb.gen_viz import viz_fiscais, viz_pct, viz_cambio
+from src.bcb.gen_viz import viz_fiscais, viz_pct, viz_cambio, viz_externo
 from utils.bucket_conn import update_logs_conn
 
 
@@ -10,7 +10,8 @@ def run_bcb(logs_df, logger = None):
     viz_functions = {
         "viz_fiscais": viz_fiscais,
         "viz_pct": viz_pct,
-        "viz_cambio": viz_cambio
+        "viz_cambio": viz_cambio,
+        "viz_externo": viz_externo
     }
 
     txt_functions = {
