@@ -2,15 +2,42 @@ import tweepy
 import os
 
 
-def text_fiscais(df, name, subtitle):
-    tweet_text = f'🇧🇷💸 {name} - {subtitle}, referência {df.index[-1].date().strftime("%m-%Y")}:\n\n'
-    dict_var = {'MoM': 'Mensal', 'YoY': 'Últimos 12 meses'}
-    for col, value in df.iloc[-1,].items():
-        tweet_text += f"- {dict_var[col]} = {value/1000:.2f} BI\n"
-            
-    tweet_text += "\nFonte: @BancoCentralBR"
+def text_fiscais(df, name):
+    ultima_data = df.index[-1].strftime('%m/%Y')
+    mom_prim = df['MoM_prim'].iloc[-1]
+    yoy_prim = df['YoY_prim'].iloc[-1]
+    mom_int = df['MoM_int'].iloc[-1]
+    yoy_int = df['YoY_int'].iloc[-1]
 
-    return tweet_text
+    if mom_prim > 0:
+        mom_prim_str = f'+R${mom_prim:.2f} bi'
+    else:
+        mom_prim_str = f'-R${abs(mom_prim):.2f} bi'
+
+    if yoy_prim > 0:
+        yoy_prim_str = f'+R${yoy_prim:.2f} bi'
+    else:
+        yoy_prim_str = f'-R${abs(yoy_prim):.2f} bi'
+
+    if mom_int > 0:
+        mom_int_str = f'+R${mom_int:.2f} bi'
+    else:
+        mom_int_str = f'-R${abs(mom_int):.2f} bi'
+
+    if yoy_int > 0:
+        yoy_int_str = f'+R${yoy_int:.2f} bi'
+    else:
+        yoy_int_str = f'-R${abs(yoy_int):.2f} bi'
+
+    tweet = (
+        f'📊💵 {name}, referência {ultima_data}:\n\n'
+        f'-Resultado primário mensal: {mom_prim_str}\n'
+        f'-Juros nominais mensais: {mom_int_str}\n\n'
+        f'-Resultado primário em 12 meses: {yoy_prim_str}\n'
+        f'-Juros nominais em 12 meses: {yoy_int_str}\n\n'
+        f'Fonte: @BancoCentralBR'
+    )
+    return tweet
 
 def text_pct(df, name):
     tweet_text = f'## {name}, referência {df.index[-1].date().strftime("%m-%Y")}:\n\n'

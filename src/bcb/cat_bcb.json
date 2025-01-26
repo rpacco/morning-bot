@@ -1,17 +1,21 @@
 [
     {
       "evento": "Estatísticas fiscais",
-      "category": "Resultado primário",
+      "category": "'Estatísticas fiscais: Primário + Juros'",
       "subtitle": "(em bilhões de R$)",
       "series": [
         4649,
-        5078
+        5078,
+        4616,
+        5045
       ],
       "colunas": [
-        "MoM",
-        "YoY"
+        "MoM_prim",
+        "YoY_prim",
+        "MoM_int",
+        "YoY_int"
       ],
-      "multiplicador": -1,
+      "multiplicador": -0.001,
       "raw": false,
       "chart": "viz_fiscais",
       "text": "text_fiscais"

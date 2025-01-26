@@ -14,110 +14,84 @@ def billions(x, pos):
 
 
 def viz_fiscais(df, name, subtitle):
-    df = df.iloc[-12:,].copy()
+    df = df.iloc[-13:].copy()
     df['month'] = df.index.strftime('%b/%y')
     
     dpi = 100
     figsize_inches = (1024 / dpi, 762 / dpi)  
 
-    # Set up the matplotlib figure
-    fig, ax1 = plt.subplots(figsize=figsize_inches, dpi=dpi)
+    fig, axs = plt.subplots(2, 1, figsize=figsize_inches, dpi=dpi, sharex=True)
 
-    # Create the barplot for monthly data on the first y-axis
-    bars = sns.barplot(x='month', y='Monthly', data=df, color='steelblue', legend=False, alpha=0.6, ax=ax1)
+    # Definir as colunas de interesse
+    mom_cols = [col for col in df.columns if col.startswith('MoM_')]
+    yoy_cols = [col for col in df.columns if col.startswith('YoY_')]
+    
+    # Definir os dataframes para cada tipo de dado
+    mom_df = df[mom_cols + ['month']]
+    yoy_df = df[yoy_cols + ['month']]
 
-    # Create a second y-axis for the TTM data
-    ax2 = ax1.twinx()
+    # Definir as colunas primárias e de juros
+    x_prim_mom = mom_cols[0]
+    x_int_mom = mom_cols[1] if len(mom_cols) > 1 else None
+    x_prim_yoy = yoy_cols[0]
+    x_int_yoy = yoy_cols[1] if len(yoy_cols) > 1 else None
 
-    # Create the lineplot for TTM data on the second y-axis
-    sns.lineplot(x='month', y='TTM', data=df, color='darkblue', marker='o', linestyle='--', legend=False, ax=ax2)
+    # Configurar o título e subtítulo do gráfico
+    fig.text(0.0, 1.2, name, fontsize=24, fontweight="bold")
+    fig.text(0.0, 1.15, f"{subtitle}. Fonte: BCB", fontsize=14)
 
-    # Rotate x-axis labels by 90 degrees
-    for tick in ax1.get_xticklabels():
-        tick.set_ha('center')  # Center-align the label text
+    # Função para plotar os gráficos
+    def plot_graph(ax, df, x_prim, x_int, title):
+        ax.set_title(title, fontsize=18)
+        
+        if x_int:
+            sns.barplot(x='month', y=x_prim, data=df, ax=ax, bottom=0, color='skyblue', label='Resultado primário')
+            
+            bottom_int = pd.Series(np.where(df[x_prim] > 0, 0, df[x_prim]), index=df.index)
+            sns.barplot(x='month', y=x_int, data=df, ax=ax, bottom=bottom_int, color='salmon', label='Juros nominais')
+        else:
+            sns.barplot(x='month', y=x_prim, data=df, ax=ax, bottom=0, color='skyblue', label='Resultado primário')
+        
+        ax.get_yaxis().set_visible(False)
+        ax.grid(axis='y', linestyle='--', alpha=0.7)
+        ax.tick_params(axis='x', which='both', length=0)
+        ax.tick_params(axis='y', which='both', length=0)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        
+        # Adicionar anotações
+        for i, month in enumerate(df['month']):
+            y_pos_prim = df[x_prim].iloc[i]
+            if abs(y_pos_prim) > 10.0:
+                ax.text(i, y_pos_prim, f"{y_pos_prim:.1f}Bi", ha='center', va='bottom', color='black', fontsize=11)
+            else:
+                ax.text(i, 0, f"{y_pos_prim:.1f}Bi", ha='center', va='bottom' if y_pos_prim > 0 else 'top', color='black', fontsize=11)
+            
+            if x_int:
+                y_pos_int = bottom_int.iloc[i] + df[x_int].iloc[i]
+                if abs(df[x_int].iloc[i]) > 10.0:
+                    ax.text(i, y_pos_int, f"{df[x_int].iloc[i]:.1f}Bi", ha='center', va='bottom', color='black', fontsize=11)
+                else:
+                    ax.text(i, 0, f"{df[x_int].iloc[i]:.1f}Bi", ha='center', va='bottom' if df[x_int].iloc[i] > 0 else 'top', color='black', fontsize=11)
+        
+        return ax
 
-    # Annotate the barplot
-    texts = []
-    for bar in bars.patches:
-        height = bar.get_height()
-        x_pos = bar.get_x() + bar.get_width() / 2
-        text = ax1.text(x_pos, height, f'{height/1000:.2f}', 
-                        ha='center', va= 'bottom' if height > 0 else 'top', color='steelblue', fontsize=10)
-        texts.append(text)
+    # Plotar os gráficos
+    axs[0] = plot_graph(axs[0], mom_df, x_prim_mom, x_int_mom, 'Mensal')
+    axs[1] = plot_graph(axs[1], yoy_df, x_prim_yoy, x_int_yoy, 'Acumulado 12 meses')
+    axs[0].legend(loc='lower left', bbox_to_anchor=(0, 1.15), ncol=2, frameon=False, fontsize=12)
+    
+    # Configurar o eixo x do segundo gráfico
+    axs[1].set_xticks(range(len(mom_df)))
+    axs[1].set_xticklabels(mom_df['month'], fontsize=12)
+    axs[1].set_xlabel('')
+    axs[1].legend_ = None
+    
+    # Ajustar o layout do gráfico
+    plt.subplots_adjust(left=0, right=1, bottom=0.1, top=1)
 
-    # Annotate the lineplot
-    line_texts = []
-    for i, (x, y) in enumerate(zip(df['month'], df['TTM'])):
-        # Use ax2 for TTM data annotations
-        text = ax2.text(i, y, f'{y/1000:.2f}', 
-                        ha='center', va='bottom', fontsize=10)
-        line_texts.append(text)
-
-    # Create a smooth curve to guide the adjustment of the text labels
-    x = np.linspace(0, len(df) - 1, 300)
-    y = np.interp(x, range(len(df)), df['TTM'])
-
-    # Adjust lineplot annotations to avoid overlap
-    adjust_text(line_texts, x=x, y=y)
-
-    # Manually add y-axis labels at the top
-    ax1.yaxis.label.set_visible(False)  # Hide default label
-    ax1.xaxis.label.set_visible(False)
-    ax2.yaxis.label.set_visible(False)  # Hide default label
-
-    # Add custom labels at the top
-    ax1.text(0, 1.0, 'Último mês\n', transform=ax1.transAxes, ha='right', va='center', color='steelblue', fontsize=14)
-    ax2.text(1, 1.0, 'Acumulado\n12 meses\n', transform=ax2.transAxes, ha='left', va='center', color='darkblue', fontsize=14)
-
-    # Setting the ticks color to match the plot
-    ax1.tick_params(axis='y', labelcolor='steelblue', labelsize=14)
-    ax2.tick_params(axis='y', labelcolor='darkblue', labelsize=14)
-    ax1.tick_params(axis='x', labelsize=14, rotation=30)
-    ax2.tick_params(axis='x', labelsize=14, rotation=30)
-
-    # Format y-axis labels as currency in billions
-    formatter = FuncFormatter(billions)
-    ax1.yaxis.set_major_formatter(formatter)
-    ax2.yaxis.set_major_formatter(formatter)
-
-    # Adjust tick locations for clarity (optional)
-    ax1.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
-    ax2.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
-
-    # Remove borders
-    ax1.spines['top'].set_visible(False)
-    ax2.spines['top'].set_visible(False)
-
-    # Add title and subtitle
-    plt.text(
-        x=-0.1, 
-        y=1.2,  
-        s=f"{name}", 
-        fontsize=40, 
-        fontweight="bold",
-        ha="left",
-        transform=plt.gca().transAxes  
-    )
-    plt.text(
-        x=-0.1, 
-        y=1.13,  
-        s=f"{subtitle}. Fonte: BCB", 
-        fontsize=18, 
-        ha="left",
-        transform=plt.gca().transAxes  
-    )
-
-    legend_handles = [
-        mlines.Line2D([], [], marker='s', markersize=15, linestyle='None', color='w', alpha=0.6, markerfacecolor='steelblue', label='Mensal'),
-        mlines.Line2D([], [], marker='o', markersize=8, linestyle='--', color='darkblue', markerfacecolor='darkblue', label='Acumulado 12 meses')
-    ]
-
-    plt.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5, 1.12), ncol=2, frameon=False, prop={'size': 16})
-
-    # Show the plot
-    plt.tight_layout()
-
-    # plt.savefig(f'{name}.jpg', dpi=dpi, bbox_inches='tight')
     # Save the plot to a BytesIO object
     img_buffer = BytesIO()
     plt.savefig(img_buffer, format='jpg', bbox_inches='tight')
