@@ -21,23 +21,6 @@
       "text": "text_fiscais"
     },
     {
-      "evento": "Estatísticas fiscais",
-      "category": "Juros nominais",
-      "subtitle": "(em bilhões de R$)",
-      "series": [
-        4616,
-        5045
-      ],
-      "colunas": [
-        "MoM",
-        "YoY"
-      ],
-      "multiplicador": -1,
-      "raw": false,
-      "chart": "viz_fiscais",
-      "text": "text_fiscais"
-    },
-    {
       "evento": "Índice de atividade econômica (IBC-Br)",
       "category": "Prévia do PIB (IBC-BR)",
       "subtitle": "Índice de Atividade Econômica do Banco Central (IBC-Br)",
