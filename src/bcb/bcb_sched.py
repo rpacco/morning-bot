@@ -52,22 +52,22 @@ def bcb_calendar(arg, logger = None):
     with open('src/bcb/month_map.json', 'r') as file:
         month_map = json.load(file)
     # Extract text content from the 'descricao' column containing HTML
-    for index, row in df.iterrows():
+    def update_descricao(row):
         html_content = row['descricao']
         if html_content:
             soup = BeautifulSoup(html_content, 'html.parser')
-            # Extract the text content from the HTML and remove unnecessary content
             description_raw = soup.get_text(strip=True).lower()
-            pattern = r'(?i)(?:janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+de\s+\d{4}'
+            pattern = r'(?i)(?:janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+de\s+(\d{4})'
             match = re.search(pattern, description_raw, re.IGNORECASE)
             if match:
                 description_raw = match.group(0).split()
-                description = " ".join([month_map[x] if x in month_map.keys() else x for x in description_raw])
-                date_description = datetime.strptime(description, '%B de %Y').date()
-                # Update the DataFrame with the extracted description
-                df.loc[index, 'descricao'] = date_description
+                description = ("".join([month_map[x] if x in month_map.keys() else x for x in description_raw])).replace('de','')
+                return pd.to_datetime(description, format='%m%Y')
             else:
-                df.loc[index, 'descricao'] = None  # or keep the original html_content or any other default value
+                return None
+        else:
+            return None
+    df['descricao'] = df.apply(update_descricao, axis=1)
 
     try:
         df = df.loc[f'{today.date()}']

@@ -25,9 +25,9 @@ def get_bc_serie(series: list, name: str, colunas: list, reference: datetime.dat
     for serie in series:
         api_url = f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{serie}/dados?formato=json"
         headers = {
-            'Accept': 'application/json, text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept': '*/*',
             'Accept-Encoding': 'gzip, deflate, br, zstd',
-            'Accept-Language': 'en-US,en;q=0.5',
+            # 'Accept-Language': 'en-US,en;q=0.5',
             'Host': 'api.bcb.gov.br',
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0'
         }
@@ -48,8 +48,9 @@ def get_bc_serie(series: list, name: str, colunas: list, reference: datetime.dat
         
     if data:
         df_merged = data[0]
-        for df in data[1:]:
-            df_merged = pd.merge(df_merged, df, on='data')
+        suffixes = [f'_{s}' for s in series[1:]]  # criar sufixos únicos
+        for i, df in enumerate(data[1:]):
+            df_merged = pd.merge(df_merged, df, on='data', suffixes=('', suffixes[i]))
         
         df_merged.set_index('data', drop=True, inplace=True)
         df_merged.columns = colunas
