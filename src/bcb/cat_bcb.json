@@ -38,21 +38,6 @@
       "text": "text_pct"
     },
     {
-      "evento": "Estatísticas monetárias e de crédito",
-      "category": "Fluxo cambial mensal",
-      "subtitle": "(em bilhões de US$)",
-      "series": [
-        13961
-      ],
-      "colunas": [
-        "fluxo_cambial_mensal"
-      ],
-      "multiplicador": 0.001,
-      "raw": true,
-      "chart": "viz_cambio",
-      "text": "text_cambio"
-    },
-    {
       "evento": "Estatísticas do setor externo",
       "category": "Transações correntes",
       "subtitle": "Saldo mensal (em bilhões de US$)",
@@ -85,5 +70,43 @@
       "raw": false,
       "chart": "viz_externo",
       "text": "text_fiscais"
+    },
+    {
+      "evento": "Estatísticas monetárias e de crédito",
+      "category": "Créditos do sistema financeiro",
+      "subtitle": "Saldo (em bilhões de R$)",
+      "series": [
+        20539,
+        20540,
+        20541
+      ],
+      "colunas": [
+        "Total",
+        "Pessoa Jurídica",
+        "Pessoa Física"
+      ],
+      "multiplicador": 0.001,
+      "raw": false,
+      "chart": "viz_credito",
+      "text": "text_credito"
+    },
+    {
+      "evento": "Estatísticas monetárias e de crédito",
+      "category": "Taxas de Juros - Créditos do SFN",
+      "subtitle": "(em % a.a.)",
+      "series": [
+        20714,
+        20715,
+        20716
+      ],
+      "colunas": [
+        "Total",
+        "Pessoa Jurídica",
+        "Pessoa Física"
+      ],
+      "multiplicador": 1,
+      "raw": false,
+      "chart": "viz_juros",
+      "text": "text_juros"
     }
   ]

@@ -2,6 +2,57 @@ import tweepy
 import os
 
 
+def text_juros(df, name):
+    # Obtem os valores atuais
+    valores_atuais = df.iloc[-1]
+
+    # Obtem os valores do último mês
+    valores_ultimo_mes = df.iloc[-2]
+
+    # Obtem os valores de 1 ano atrás
+    valores_1_ano_atras = df.iloc[-13]
+
+    ref = df.index[-1].strftime('%m/%Y')
+
+    # Cria o tweet
+    tweet = f"{name}, referência {ref}:\n\n"
+    for col in df.columns:
+        valor_atual = valores_atuais[col]
+        var_ultimo_mes = (valor_atual - valores_ultimo_mes[col]) * 100  # converte para basis points
+        var_1_ano_atras = (valor_atual - valores_1_ano_atras[col]) * 100  # converte para basis points
+        moM_emoji = "🔺" if var_ultimo_mes > 0 else "🔻" if var_ultimo_mes < 0 else ""
+        yoY_emoji = "🔺" if var_1_ano_atras > 0 else "🔻" if var_1_ano_atras < 0 else ""
+        tweet += f"{col}: {valor_atual:.2f}% (MoM: {moM_emoji}{var_ultimo_mes:.0f}bps, YoY: {yoY_emoji}{var_1_ano_atras:.0f}bps)\n"
+    tweet += "\nFonte: @BancoCentralBR"
+
+    return tweet
+
+def text_credito(df, name):
+    # Calcula a variação mensal
+    df['Variação Mensal PJ'] = df['Pessoa Jurídica'].pct_change() * 100
+    df['Variação Mensal PF'] = df['Pessoa Física'].pct_change() * 100
+    
+    # Calcula a variação acumulada em 12 meses
+    df['Variação Acumulada 12M PJ'] = df['Pessoa Jurídica'].pct_change(periods=12) * 100
+    df['Variação Acumulada 12M PF'] = df['Pessoa Física'].pct_change(periods=12) * 100
+    
+    # Pega as informações do último mês
+    ultimo_mes = df.iloc[-1]
+    
+    # Cria o tweet
+    tweet = (
+        f"📊 {name}, referência: {ultimo_mes.name.strftime('%m/%Y')}\n\n"
+        f"Valor Total: {ultimo_mes['Total']:.2f} Bi\n"
+        f"PJ: {ultimo_mes['Pessoa Jurídica']:.2f} Bi\n"
+        f"-Mensal: {'Alta' if ultimo_mes['Variação Mensal PJ'] > 0 else 'Baixa'} de {ultimo_mes['Variação Mensal PJ']:.2f}%\n"
+        f"-Acumulado 12 meses: {'Alta' if ultimo_mes['Variação Acumulada 12M PJ'] > 0 else 'Baixa'} de {ultimo_mes['Variação Acumulada 12M PJ']:.2f}%\n"
+        f"PF: {ultimo_mes['Pessoa Física']:.2f} Bi\n"
+        f"-Mensal: {'Alta' if ultimo_mes['Variação Mensal PF'] > 0 else 'Baixa'} de {ultimo_mes['Variação Mensal PF']:.2f}%\n"
+        f"-Acumulado 12 meses: {'Alta' if ultimo_mes['Variação Acumulada 12M PF'] > 0 else 'Baixa'} de {ultimo_mes['Variação Acumulada 12M PF']:.2f}%\n\n"
+        "Fonte: @BancoCentralBR"
+    )
+    return tweet
+
 def text_fiscais(df, name):
     ultima_data = df.index[-1].strftime('%m/%Y')
     mom_prim = df['MoM_prim'].iloc[-1]
