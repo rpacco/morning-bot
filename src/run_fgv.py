@@ -32,6 +32,8 @@ def run_fgv_scheduler(logger, logs_df):
         ct_titles = row['meta']
         sched_time = f'{row["hora"][0]} {row["hora"][-1] if row["hora"][-1] else 0}'
         ref_date = pd.to_datetime(row['reference']).date()
+        name = row['name']
+        subtitle = row['subtitle']
 
         logger.log_text(f"Running FGVSpider for {title} at {sched_time}", severity="INFO")
         try:
@@ -44,7 +46,7 @@ def run_fgv_scheduler(logger, logs_df):
 
             try:
                 twt_text = gen_text(result_df, title)
-                img_buff = chart_viz(result_df, title, logger)
+                img_buff = chart_viz(result_df, name, subtitle, logger)
                 create_tweet(text=twt_text, image_path=f"{title}", image_buffer=img_buff)
                 img_buff.close()
                 logger.log_text(f"Tweet created and sent for {title}", severity="INFO")
