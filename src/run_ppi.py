@@ -13,12 +13,23 @@ def run_ppi(logger, logs_df):
     PROJECT_ID = os.environ.get('PROJECT_ID')
     DATASET_ID = os.environ.get('DATASET_ID')
     TABLE_ID = os.environ.get('TABLE_ID')
+    
+    combs = ['diesel_pct', 'gasolina_pct']
+    already_tweeted = []
+    for comb in combs:
+        if comb in logs_df['indicator'].values:
+            logger.log_text(f"Indicator already tweeted: {comb}", severity="INFO")
+            already_tweeted.append(comb)
+            continue
 
+    if len(already_tweeted) == len(combs):
+        logger.log_text("ABICOM PPI data already tweeted", severity="INFO")
+        return "ABICOM PPI data already tweeted"
+    
     today = datetime.today().date()
     start_date = today - timedelta(5)
     crawler = PpiCrawler(start_date)
     data = crawler.run()
-    combs = ['diesel_pct', 'gasolina_pct']
     
     if data is None:
         logger.log_text("ABICOM PPI crawler returned no data.", severity="WARNING")
@@ -32,12 +43,9 @@ def run_ppi(logger, logs_df):
     
     processed_count = 0
     errors = []
-    already_tweeted = []
 
     for comb in combs:
-        if comb in logs_df['indicator'].values:
-            logger.log_text(f"Indicator already tweeted: {comb}", severity="INFO")
-            already_tweeted.append(comb)
+        if comb in already_tweeted:
             continue
 
         try:
