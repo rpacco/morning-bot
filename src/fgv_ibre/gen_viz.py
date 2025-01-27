@@ -7,7 +7,7 @@ import adjustText
 from io import BytesIO
 from google.cloud import logging as gcp_logging
 
-def chart_viz(df, name, logger: gcp_logging.Logger):
+def chart_viz(df, name, subtitle, logger: gcp_logging.Logger):
     try:
         df = df.iloc[-60:, ]
         dpi = 100
@@ -19,7 +19,7 @@ def chart_viz(df, name, logger: gcp_logging.Logger):
             sns.lineplot(data=df[col], color=colors[i], linewidth=3, dashes=False, label=col)
 
         ax = plt.gca()
-        ax.patch.set_facecolor('#f2f2f2')
+        # ax.patch.set_facecolor('#f2f2f2')
 
         date_format = mdates.DateFormatter('%b-%Y')
         plt.gca().xaxis.set_major_formatter(date_format)
@@ -28,15 +28,28 @@ def chart_viz(df, name, logger: gcp_logging.Logger):
         last_index = df.index[-1]
         xticks = pd.date_range(start=first_index, end=last_index, periods=30)
 
-        plt.xticks(xticks, [date.strftime('%b-%Y') for date in xticks], rotation=90)
+        plt.xticks(xticks, [date.strftime('%b-%Y') for date in xticks], rotation=90, size=14)
+        plt.yticks(size=14)
         plt.xlabel('')
 
-        plt.figtext(
-            0.5, 0.99, f'{name}', ha='center',
-            fontsize=26, fontweight='demibold', color='darkslategray'
+        # Title and subtitle
+        plt.text(
+            x=-0.03, 
+            y=1.05,  
+            s=f"{name}",
+            fontsize=36, 
+            fontweight="bold",
+            ha="left",
+            transform=fig.transFigure  
         )
-
-        plt.figtext(0.96, 0.08, 'Fonte:\nFGV-Ibre.', fontsize=12, color='darkslategray', ha='center')
+        plt.text(
+            x=-0.03, 
+            y=1.00,  
+            s=f"{subtitle}. Fonte: FGV-IBRE", 
+            fontsize=16, 
+            ha="left",
+            transform=fig.transFigure  
+        )
         plt.ylabel('')
 
         ax.spines['top'].set_visible(False)
@@ -52,7 +65,7 @@ def chart_viz(df, name, logger: gcp_logging.Logger):
         texts = []
         for i, col in enumerate(df.columns):
             last_value = df[col].iloc[-1]
-            annotation = plt.text(last_index, last_value, f'{last_value:.2f}', ha='left', va='center', color=colors[i], weight='bold')
+            annotation = plt.text(last_index, last_value, f'{last_value:.2f}', ha='left', va='center', color=colors[i], weight='bold', fontsize=14)
             texts.append(annotation)
 
         adjustText.adjust_text(texts, ax=ax, expand=(1.2, 1.2))
@@ -65,7 +78,7 @@ def chart_viz(df, name, logger: gcp_logging.Logger):
 
         plt.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5, 1.1), ncol=len(df.columns), frameon=False, fontsize=14)
         plt.tight_layout()
-        plt.subplots_adjust(top=0.9, bottom=0.15, left=0, right=1)
+        plt.subplots_adjust(top=0.9, bottom=0.15, right=1, left=0)
 
         img_buffer = BytesIO()
         plt.savefig(img_buffer, format='jpg', bbox_inches='tight', dpi=dpi)
