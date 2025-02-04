@@ -5,11 +5,11 @@ from utils.bucket_conn import update_logs_conn
 from datetime import datetime
 
 
-def run_ssp(logger, logs_df):
+def run_ssp(logger, logs_df, month_logs_df):
     logger.log_text("Starting SSP crawler", severity="INFO")
     name = 'roubos'
 
-    if name in logs_df['indicator'].values:
+    if name in month_logs_df['indicator'].values:
         logger.log_text(f"Indicator already tweeted: {name}", severity="INFO")
         return 'SSP crawler already tweeted!'
     
