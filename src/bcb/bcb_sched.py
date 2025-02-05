@@ -1,4 +1,5 @@
 import pandas as pd
+from pandas.tseries.offsets import BDay
 from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
@@ -68,6 +69,29 @@ def bcb_calendar(arg, logger = None):
         else:
             return None
     df['descricao'] = df.apply(update_descricao, axis=1)
+
+    ref_dates_cambial = df.query('evento == "Estatísticas do setor externo"').index.to_list()
+    dates_cambial = [(pd.to_datetime(date) + BDay(3)) for date in ref_dates_cambial]
+    cambial_evento = 'Fluxo Cambial'
+    cambial_fim_evento = None
+    cambial_local = None
+    cambial_dia_inteiro = 'Não'
+
+    cambial_rows = []
+    for dataEvento, descricao in zip(dates_cambial, ref_dates_cambial):
+        cambial_rows.append({
+            'dataEvento': dataEvento.strftime('%Y-%m-%d'),  # Convert to datetime
+            'evento': cambial_evento,
+            'fimEvento': cambial_fim_evento,
+            'descricao': descricao,
+            'local': cambial_local,
+            'diaInteiro': cambial_dia_inteiro
+        })
+    cambial_df = pd.DataFrame(cambial_rows)
+    cambial_df.set_index('dataEvento', inplace=True)
+
+    df = pd.concat([df, cambial_df])
+    df.sort_index(inplace=True)
 
     try:
         df = df.loc[f'{today.date()}']

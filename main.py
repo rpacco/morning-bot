@@ -20,7 +20,7 @@ def main_run(request):
     result_bcb = run_bcb(log_posts_df, logger)
     result_abicom = run_ppi(logger, log_posts_df)
     result_anfa = run_anfa(logger, log_posts_df)
-    result_ssp = run_ssp(logger, month_log_posts_df)
+    result_ssp = run_ssp(logger, log_posts_df, month_log_posts_df)
 
     if isinstance(result_fgv, tuple):
         result_fgv = " ".join(result_fgv) if all(isinstance(item, str) for item in result_fgv) else str(result_fgv)
