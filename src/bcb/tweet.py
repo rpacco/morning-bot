@@ -104,16 +104,29 @@ def text_pct(df, name):
     return tweet_text
 
 def text_cambio(df, name):
-    monthly_data = df.resample('ME').sum().iloc[-13:]
+    monthly_data = df.resample('ME').sum().iloc[-12:]
     ref = df.index[-1]
-    tweet_text = f'\U0001F4B8 {name}, até {ref.date().strftime("%d-%m-%Y")}:\n\n'
-    value = monthly_data.iloc[-1].values[0]
-    if value > 0:
-            tweet_text += f"\U0001F7E2 Entrada de US$ {value:.2f} BI.\n"
+    current_value = monthly_data.iloc[-1].values[0]
+    accumulated_value = monthly_data.sum().values[0]
+    # Start building the tweet text
+    tweet_text = f'\U0001F4B8 {name}, referência {ref.date().strftime('%m/%Y')}:\n\n'
+    
+    # Current month's value text
+    if current_value > 0:
+        tweet_text += f"\U0001F7E2 Entrada de US$ {current_value:.2f} BI no mês.\n"
     else:
-        tweet_text += f"\U0001F534 Saída de US$ {value:.2f} BI.\n"
-            
+        tweet_text += f"\U0001F534 Saída de US$ {abs(current_value):.2f} BI no mês.\n"
+    
+    # Accumulated 12-month value text
+    if accumulated_value > 0:
+        tweet_text += f"\U0001F7E2 Acumulado 12 meses: entrada de US$ {accumulated_value:.2f} BI.\n"
+    else:
+        tweet_text += f"\U0001F534 Acumulado 12 meses: saída de US$ {abs(accumulated_value):.2f} BI.\n"
+    
+    # Add source information
     tweet_text += "\nFonte: @BancoCentralBR"
+    
+    return tweet_text
 
 
 def create_tweet(text, image_path, image_buffer):
