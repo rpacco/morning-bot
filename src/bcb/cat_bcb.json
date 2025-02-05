@@ -108,5 +108,43 @@
       "raw": false,
       "chart": "viz_juros",
       "text": "text_juros"
-    }
+    },
+    {
+      "evento": "Estatísticas monetárias e de crédito",
+      "category": "Créditos do Sistema Financeiro",
+      "subtitle": "(Saldo, em bilhões de R$)",
+      "series": [
+          20542,
+          20593,
+          20539
+      ],
+      "colunas": [
+        "Livre",
+        "Direcionado",
+        "Total"
+      ],
+      "multiplicador": 0.001,
+      "raw": false,
+      "chart": "viz_credito_livredir",
+      "text": "text_credito_livredir"
+    },
+    {
+      "evento": "Estatísticas monetárias e de crédito",
+      "category": "Créditos do Sistema Financeiro",
+      "subtitle": "(Juros, em %)",
+      "series": [
+          20717,
+          20756,
+          20714
+      ],
+      "colunas": [
+        "Livre",
+        "Direcionado",
+        "Total"
+      ],
+      "multiplicador": 1,
+      "raw": false,
+      "chart": "viz_juros",
+      "text": "text_juros"
+    } 
   ]

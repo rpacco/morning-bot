@@ -434,3 +434,66 @@ def viz_juros(df, name, subtitle):
 
     # Return the BytesIO object
     return img_buffer
+
+
+def viz_credito_livredir(df, name, subtitle):
+    # Only consider the last 13 months of data
+    df = df.iloc[-13:].copy()
+    df['month'] = df.index.strftime('%b/%y')
+    
+    dpi = 100
+    figsize_inches = (1024 / dpi, 762 / dpi)  # Adjusted height since we're only plotting one chart
+
+    fig, ax = plt.subplots(figsize=figsize_inches, dpi=dpi)
+
+    # Configurar o título e subtítulo do gráfico
+    fig.text(0.0, 1.05, name, fontsize=24, fontweight="bold")
+    fig.text(0.0, 1.0, f"{subtitle}. Fonte: BCB", fontsize=14)
+
+    # Plot 'Livre' first
+    sns.barplot(data=df, x='month', y='Livre', color='skyblue', label='Livre')
+    
+    # Plot 'Direcionado' on top of 'Livre'
+    bottom_values = df['Livre'].values
+    sns.barplot(data=df, x='month', y='Direcionado', bottom=bottom_values, color='salmon', label='Direcionado')
+
+    # Customize the plot appearance
+    ax.get_yaxis().set_visible(False)
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+    ax.tick_params(axis='x', which='both', length=0)
+    ax.tick_params(axis='y', which='both', length=0)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+
+    # Add annotations for both bars
+    for i, month in enumerate(df['month']):
+        y_fisica = df['Livre'].iloc[i]
+        y_juridica = df['Direcionado'].iloc[i]
+        y_total = df['Total'].iloc[i]
+        
+        # For Livre
+        ax.text(i, y_fisica/2, f"{y_fisica:.1f}", ha='center', va='center', color='black', fontsize=11)
+        
+        # For Direcionado
+        ax.text(i, y_fisica + y_juridica/2, f"{df['Direcionado'].iloc[i]:.1f}", ha='center', va='bottom', color='black', fontsize=11)
+
+        # For Total
+        ax.text(i, y_total, f"Total\n{df['Total'].iloc[i]:.1f}", ha='center', va='bottom', color='black', fontsize=11)
+
+    ax.set_xticks(range(len(df)))
+    ax.set_xticklabels(df['month'], fontsize=12)
+    ax.set_xlabel('')
+    ax.legend(loc='upper left', bbox_to_anchor=(0, 1.15), ncol=2, frameon=False, fontsize=12)
+
+    # Ajustar o layout do gráfico
+    plt.subplots_adjust(left=0, right=1, bottom=0.1, top=1)
+    plt.tight_layout()
+    # Save the plot to a BytesIO object
+    img_buffer = BytesIO()
+    plt.savefig(img_buffer, format='jpg', bbox_inches='tight')
+    img_buffer.seek(0)  # Move the cursor to the beginning of the BytesIO object
+
+    # Return the BytesIO object
+    return img_buffer

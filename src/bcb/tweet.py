@@ -128,6 +128,32 @@ def text_cambio(df, name):
     
     return tweet_text
 
+def text_credito_livredir(df, name):
+    # Calcula a variação mensal
+    df['Variação Mensal Direcionado'] = df['Direcionado'].pct_change() * 100
+    df['Variação Mensal Livre'] = df['Livre'].pct_change() * 100
+    
+    # Calcula a variação acumulada em 12 meses
+    df['Variação Acumulada 12M Direcionado'] = df['Direcionado'].pct_change(periods=12) * 100
+    df['Variação Acumulada 12M Livre'] = df['Livre'].pct_change(periods=12) * 100
+    
+    # Pega as informações do último mês
+    ultimo_mes = df.iloc[-1]
+    
+    # Cria o tweet
+    tweet = (
+        f"📊 {name}, referência: {ultimo_mes.name.strftime('%m/%Y')}\n\n"
+        f"Valor Total: {ultimo_mes['Total']:.2f} Bi\n"
+        f"\nDirecionado: {ultimo_mes['Direcionado']:.2f} Bi\n"
+        f"-Mensal: {'Alta' if ultimo_mes['Variação Mensal Direcionado'] > 0 else 'Baixa'} de {ultimo_mes['Variação Mensal Direcionado']:.2f}%\n"
+        f"-Acumulado 12 meses: {'Alta' if ultimo_mes['Variação Acumulada 12M Direcionado'] > 0 else 'Baixa'} de {ultimo_mes['Variação Acumulada 12M Direcionado']:.2f}%\n"
+        f"\nLivre: {ultimo_mes['Livre']:.2f} Bi\n"
+        f"-Mensal: {'Alta' if ultimo_mes['Variação Mensal Livre'] > 0 else 'Baixa'} de {ultimo_mes['Variação Mensal Livre']:.2f}%\n"
+        f"-Acumulado 12 meses: {'Alta' if ultimo_mes['Variação Acumulada 12M Livre'] > 0 else 'Baixa'} de {ultimo_mes['Variação Acumulada 12M Livre']:.2f}%\n\n"
+        "Fonte: @BancoCentralBR"
+    )
+    return tweet
+
 
 def create_tweet(text, image_path, image_buffer):
     # Retrieve environment variables

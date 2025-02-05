@@ -1,8 +1,8 @@
 import pandas as pd
 from src.bcb.bcb_sched import bcb_calendar
 from src.bcb.bcb import get_bc_serie
-from src.bcb.tweet import text_fiscais, text_pct, text_cambio, create_tweet, text_credito, text_juros
-from src.bcb.gen_viz import viz_fiscais, viz_pct, viz_cambio, viz_externo, viz_credito, viz_juros
+from src.bcb.tweet import text_fiscais, text_pct, text_cambio, create_tweet, text_credito, text_juros, text_credito_livredir
+from src.bcb.gen_viz import viz_fiscais, viz_pct, viz_cambio, viz_externo, viz_credito, viz_juros, viz_credito_livredir
 from utils.bucket_conn import update_logs_conn
 
 
@@ -13,7 +13,8 @@ def run_bcb(logs_df, logger = None):
         "viz_cambio": viz_cambio,
         "viz_externo": viz_externo,
         "viz_credito": viz_credito,
-        "viz_juros": viz_juros
+        "viz_juros": viz_juros,
+        "viz_credito_livredir": viz_credito_livredir
     }
 
     txt_functions = {
@@ -21,7 +22,8 @@ def run_bcb(logs_df, logger = None):
         "text_pct": text_pct,
         "text_cambio": text_cambio,
         "text_credito": text_credito,
-        "text_juros": text_juros
+        "text_juros": text_juros,
+        "text_credito_livredir": text_credito_livredir
     }
     logger.log_text("Starting BCB scheduler crawler", severity="INFO")
 
