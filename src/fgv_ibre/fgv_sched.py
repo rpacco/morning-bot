@@ -71,7 +71,6 @@ def parse_calendar_html(html: str, logger: gcp_logging.Logger) -> pd.DataFrame:
     df['title'] = df['title'].str.replace(pattern_ref, '', regex=True).str.strip(' -')
     
     df.dropna(inplace=True)
-    df.to_csv('calendar.csv', index=False)
 
     try:
         with open('src/fgv_ibre/cat_fgv.json', 'r') as f:

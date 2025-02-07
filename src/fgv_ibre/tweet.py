@@ -1,5 +1,6 @@
 import tweepy
 import os
+import pandas as pd
 
 def gen_text(df, title, emojis):
     tweet_text = f'{emojis} {title}, referência {df.index[-1].date().strftime("%m-%Y")}:\n\n'
