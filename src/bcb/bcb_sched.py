@@ -44,7 +44,6 @@ def bcb_calendar(arg, logger = None):
                 dataframes.append(pd.DataFrame(data))
     # Concatenate all DataFrames into a single DataFrame
     df = pd.concat(dataframes)
-    print(df.iloc[0,3])
     # Convert 'dataEvento' column to datetime and set it as the DataFrame index
     df['dataEvento'] = pd.to_datetime(df['dataEvento'])
     df.set_index('dataEvento', drop=True, inplace=True)
@@ -95,7 +94,6 @@ def bcb_calendar(arg, logger = None):
 
     try:
         df = df.loc[f'{today.date()}']
-        print(df)
         if isinstance(df, pd.DataFrame):
             logger.log_text(f"{len(df)} indicators release predicted for today", severity="INFO")
             return df
@@ -108,9 +106,3 @@ def bcb_calendar(arg, logger = None):
     except:
         logger.log_text(f"No data scheduled for {today.date()}", severity="INFO")
         return None
-    
-if __name__ == '__main__':
-    from google.cloud import logging as gcp_logging
-    client = gcp_logging.Client()
-    logger = client.logger('main_run')
-    bcb_calendar('mes', logger)
