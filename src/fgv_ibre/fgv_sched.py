@@ -71,12 +71,13 @@ def parse_calendar_html(html: str, logger: gcp_logging.Logger) -> pd.DataFrame:
     df['title'] = df['title'].str.replace(pattern_ref, '', regex=True).str.strip(' -')
     
     df.dropna(inplace=True)
+    df.to_csv('calendar.csv', index=False)
 
     try:
-        with open('src/fgv_ibre/cat_fgv.csv', 'r') as f:
-            cat_fgv_df = pd.read_csv(f, delimiter=';')
+        with open('src/fgv_ibre/cat_fgv.json', 'r') as f:
+            cat_fgv_df = pd.read_json(f)
     except FileNotFoundError:
-        logger.log_text("File 'cat_fgv.csv' not found", severity="ERROR")
+        logger.log_text("File 'cat_fgv.json' not found", severity="ERROR")
         return pd.DataFrame()
 
     df = pd.merge(df, cat_fgv_df, left_on='title', right_on='indice', how='right')

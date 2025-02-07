@@ -1,33 +1,22 @@
 import tweepy
 import os
 
-def gen_text(df, title):
-    columns_lower = [x.lower() for x in df.columns]
-    if any('pib' in col for col in columns_lower):
-        tweet_text = f'## {title}, referência {df.index[-1].date().strftime("%m-%Y")}:\n'
-        var_mom = df['PIB a preços de mercado com ajuste sazonal'].pct_change(1).iloc[-1]
-        var_yoy = (((df['PIB a preços de mercado'].rolling(12).sum() / df['PIB a preços de mercado'].shift(12).rolling(12).sum()) - 1)).iloc[-1]
-        if var_mom > 0:
-            tweet_text += f"\U0001F4C8 Alta de {var_mom:.2%} M/M.\n"
-        else:
-            tweet_text += f"\U0001F4C9 Queda de {var_mom:.2%} M/M.\n"
-        if var_yoy > 0:
-            tweet_text += f"\U0001F4C8 Alta de {var_yoy:.2%} em 12 meses.\n"
-        else:
-            tweet_text += f"\U0001F4C9 Queda de {var_yoy:.2%} em 12 meses.\n"
-        
-        tweet_text += "\nFonte: @FGVIBRE"
-
-    else:
-        var_mm = df.pct_change().iloc[-1,:].sort_values(ascending=False)
-        # Assuming df and var_mm are already defined
-        tweet_text = f'## {title}, referência {df.index[-1].date().strftime("%m-%Y")}:\n'
-        for col, value in var_mm.items():
-            if value > 0:
-                tweet_text += f"\U0001F4C8 {col.strip()}, alta de {value:.2%} M/M.\n"
-            else:
-                tweet_text += f"\U0001F4C9 {col.strip()}, queda de {value:.2%} M/M.\n"
-        tweet_text += "\nFonte: @FGVIBRE"
+def gen_text(df, title, emojis):
+    tweet_text = f'{emojis} {title}, referência {df.index[-1].date().strftime("%m-%Y")}:\n\n'
+    var_mom = df.pct_change(1).iloc[-1]
+    var_yoy = (df.rolling(12).sum() / df.shift(12).rolling(12).sum() - 1).iloc[-1]
+    df_merged = pd.concat([var_mom, var_yoy], axis=1).T
+    df_merged.index = ['MoM', 'YoY']
+    for col in df_merged.columns:
+        tweet_text += f'-{col}:'
+        for index, value in df_merged[col].items():
+            tweet_text += (
+                f' {value:.2%} {index};'
+                f''
+                )
+        tweet_text += '\n'
+    
+    tweet_text += "\nFonte: @FGVIBRE"
 
     return tweet_text
 

@@ -1,0 +1,106 @@
+[
+    {
+      "indice": "Índice de Confiança Empresarial (ICE)",
+      "codes": ["1428467", "1428469", "1428471"],
+      "meta": ["Total", "Atual", "Expectativas"],
+      "name": "Índice de Confiança Empresarial",
+      "subtitle": "ICE, com ajuste sazonal",
+      "emojis": "🤝📈"
+    },
+    {
+      "indice": "Indicador de Incerteza da Economia Brasil (IIE-Br)",
+      "codes": ["1428452", "1463188", "1463189"],
+      "meta": ["Total", "Componente Mídia", "Componente Expectativas"],
+      "name": "Indicador de Incerteza da Economia",
+      "subtitle": "IIE-BR",
+      "emojis": "🇧🇷❓"
+    },
+    {
+      "indice": "Indicador Antecedente de Emprego (IAEmp)",
+      "codes": ["1416205"],
+      "meta": ["IAEmp"],
+      "name": "Indicador Antecedente de Emprego",
+      "subtitle": "IAEmp, com ajuste sazonal",
+      "emojis": "👷📊"
+    },
+    {
+      "indice": "Índice de Variação de Aluguéis Residenciais (IVAR)",
+      "codes": ["1463201", "1463202", "1463203", "1463204", "1463205"],
+      "meta": ["Média Nacional", "São Paulo", "Rio de Janeiro", "Belo Horizonte", "Porto Alegre"],
+      "name": "Índice Aluguéis Residenciais",
+      "subtitle": "IVAR",
+      "emojis": "🏠💵"
+    },
+    {
+      "indice": "IGP-DI e os componentes: IPA-DI, IPC-DI e INCC-DI",
+      "codes": ["161384", "1473520", "1431264", "1464783"],
+      "meta": ["IGP-DI", "IPA-DI", "IPC-DI", "INCC-DI"],
+      "name": "IGP-DI e os componentes",
+      "subtitle": "IGP-DI, IPA-DI, IPC-DI e INCC-DI",
+      "emojis": "📋📊"
+    },
+    {
+      "indice": "IGP-10 e os componentes: IPA-10, IPC-10 e INCC-10",
+      "codes": ["209425", "1476582", "1430841", "1464331"],
+      "meta": ["IGP-10", "IPA-10", "IPC-10", "INCC-10"],
+      "name": "IGP-10 e os componentes",
+      "subtitle": "IGP-10, IPA-10, IPC-10 e INCC-10",
+      "emojis": "📋📊"
+    },
+    {
+      "indice": "Monitor do PIB",
+      "codes": ["1428682", "1428676"],
+      "meta": ["PIB a preços de mercado com ajuste sazonal", "PIB a preços de mercado"],
+      "name": "Monitor do PIB",
+      "subtitle": "em volume mensal",
+      "emojis": "📊💵"
+    },
+    {
+      "indice": "Sondagem do Consumidor",
+      "codes": ["1006982", "1006984", "1006983"],
+      "meta": ["Total", "Expectativas", "Atual"],
+      "name": "Sondagem do Consumidor",
+      "subtitle": "com ajuste sazonal",
+      "emojis": "📋🛒"
+    },
+    {
+      "indice": "Sondagem da Construção",
+      "codes": ["1416232", "1416233", "1416234"],
+      "meta": ["Total", "Expectativas", "Atual"],
+      "name": "Sondagem da Construção",
+      "subtitle": "com ajuste sazonal",
+      "emojis": "📋🏗️"
+    },
+    {
+      "indice": "Sondagem da Indústria",
+      "codes": ["1416212", "1416214", "1416213"],
+      "meta": ["Total", "Expectativas", "Atual"],
+      "name": "Sondagem da Indústria",
+      "subtitle": "com ajuste sazonal",
+      "emojis": "📋🏭"
+    },
+    {
+      "indice": "Sondagem do Comércio",
+      "codes": ["1416226", "1416228", "1416227"],
+      "meta": ["Total", "Expectativas", "Atual"],
+      "name": "Sondagem do Comércio",
+      "subtitle": "com ajuste sazonal",
+      "emojis": "📋🛍️"
+    },
+    {
+      "indice": "IGP-M e os componentes: IPA-M e IPC-M",
+      "codes": ["200045", "1477432", "1431687"],
+      "meta": ["IGP-M", "IPA-M", "IPC-M"],
+      "name": "IGP-M e os componentes",
+      "subtitle": "IGP-M, IPA-M e IPC-M",
+      "emojis": "📋📊"
+    },
+    {
+      "indice": "Sondagem de Serviços",
+      "codes": ["1416217", "1416219", "1416218"],
+      "meta": ["Total", "Expectativas", "Atual"],
+      "name": "Sondagem de Serviços",
+      "subtitle": "com ajuste sazonal",
+      "emojis": "📋🤝"
+    }
+  ]

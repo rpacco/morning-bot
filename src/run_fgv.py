@@ -34,6 +34,7 @@ def run_fgv_scheduler(logger, logs_df):
         ref_date = pd.to_datetime(row['reference']).date()
         name = row['name']
         subtitle = row['subtitle']
+        emojis = row['emojis']
 
         logger.log_text(f"Running FGVSpider for {title} at {sched_time}", severity="INFO")
         try:
@@ -45,7 +46,7 @@ def run_fgv_scheduler(logger, logs_df):
                 continue
 
             try:
-                twt_text = gen_text(result_df, title)
+                twt_text = gen_text(result_df, title, emojis)
                 img_buff = chart_viz(result_df, name, subtitle, logger)
                 create_tweet(text=twt_text, image_path=f"{title}", image_buffer=img_buff)
                 img_buff.close()
