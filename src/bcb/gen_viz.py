@@ -38,12 +38,13 @@ def viz_fiscais(df, name, subtitle):
     x_int_yoy = yoy_cols[1] if len(yoy_cols) > 1 else None
 
     # Configurar o título e subtítulo do gráfico
-    fig.text(0.0, 1.2, name, fontsize=24, fontweight="bold")
-    fig.text(0.0, 1.15, f"{subtitle}. Fonte: BCB", fontsize=14)
+    fig.text(0.0, 1.2, name, fontsize=36, fontweight="heavy")
+    fig.text(0.0, 1.165, f"{subtitle}. Fonte: BCB", fontsize=14)
+    fig.text(0.0, 1.13, "@EconDataViz", fontsize=13, fontweight='heavy')
 
     # Função para plotar os gráficos
     def plot_graph(ax, df, x_prim, x_int, title):
-        ax.set_title(title, fontsize=18)
+        ax.set_title(title, fontsize=18, fontweight='heavy')
         
         if x_int:
             sns.barplot(x='month', y=x_prim, data=df, ax=ax, bottom=0, color='skyblue', label='Resultado primário')
@@ -82,7 +83,7 @@ def viz_fiscais(df, name, subtitle):
     # Plotar os gráficos
     axs[0] = plot_graph(axs[0], mom_df, x_prim_mom, x_int_mom, 'Mensal')
     axs[1] = plot_graph(axs[1], yoy_df, x_prim_yoy, x_int_yoy, 'Acumulado 12 meses')
-    axs[0].legend(loc='lower left', bbox_to_anchor=(0, 1.15), ncol=2, frameon=False, fontsize=12)
+    axs[0].legend(loc='lower center', bbox_to_anchor=(0.5, 1.15), ncol=2, frameon=False, fontsize=12)
     
     # Configurar o eixo x do segundo gráfico
     axs[1].set_xticks(range(len(mom_df)))
@@ -116,14 +117,14 @@ def viz_pct(df, name, subtitle):
     plt.bar(x_positions - bar_width/2, df['MoM'], width=bar_width, label='Valor MM', color='royalblue')
     plt.bar(x_positions + bar_width/2, df['YoY'], width=bar_width, label='Valor 12MM', color='orange')
 
-    plt.xticks(ticks=x_positions, labels=[x.strftime("%b/%y") for x in df.index], size=14, color='darkslategray')
+    plt.xticks(ticks=x_positions, labels=[x.strftime("%b/%y") for x in df.index], size=14)
     plt.ylabel('')
     plt.yticks([])
     plt.tick_params(axis='x', length=0, width=0)
 
     for index, (value_mm, value_12mm) in enumerate(zip(df['MoM'], df['YoY'])):
-        plt.text(index - bar_width/2, value_mm, f'{value_mm:.2f}', ha='center', va='bottom' if value_mm >= 0 else 'top', fontsize=12, color='darkslategray')
-        plt.text(index + bar_width/2, value_12mm, f'{value_12mm:.2f}', ha='center', va='bottom' if value_12mm >= 0 else 'top', fontsize=12, color='darkslategray')
+        plt.text(index - bar_width/2, value_mm, f'{value_mm:.2f}', ha='center', va='bottom' if value_mm >= 0 else 'top', fontsize=11, fontweight='heavy')
+        plt.text(index + bar_width/2, value_12mm, f'{value_12mm:.2f}', ha='center', va='bottom' if value_12mm >= 0 else 'top', fontsize=11, fontweight='heavy')
 
     ax = plt.gca()
     for label in ax.get_xticklabels():
@@ -146,6 +147,15 @@ def viz_pct(df, name, subtitle):
         fontsize=16, 
         ha="left",
         transform=plt.gca().transAxes  
+    )
+    plt.text(
+        x=0, 
+        y=1.08,  
+        s="@EconDataViz", 
+        fontsize=13,
+        fontweight='heavy', 
+        ha="left",
+        transform=plt.gca().transAxes 
     )
 
     # Remove borders
@@ -206,15 +216,15 @@ def viz_cambio(df, name, subtitle):
         if height >= 0:
             ax.text(bar.get_x() + bar.get_width()/2., height,
                     f'{height:.2f}', 
-                    ha='center', va='bottom', color='black', fontsize=13)
+                    ha='center', va='bottom', color='black', fontsize=13, fontweight='heavy')
         else:
             ax.text(bar.get_x() + bar.get_width()/2., height,
                     f'{height:.2f}', 
-                    ha='center', va='top', color='black', fontsize=13)
+                    ha='center', va='top', color='black', fontsize=13, fontweight='heavy')
             
     ax.text(
-        x=0.03,
-        y=1.05,
+        x=0,
+        y=1.15,
         s=f"{name}", 
         fontsize=32, 
         fontweight="bold",
@@ -222,13 +232,22 @@ def viz_cambio(df, name, subtitle):
         transform=ax.transAxes
     )
     ax.text(
-        x=0.03, 
-        y=1.01,
+        x=0, 
+        y=1.1,
         s=f"acumulado até {last_date} {subtitle}. Fonte: BCB", 
         fontsize=12, 
         alpha=0.75,
         ha="left",
         transform=ax.transAxes
+    )
+    ax.text(
+        x=0, 
+        y=1.06,  
+        s="@EconDataViz", 
+        fontsize=13,
+        fontweight='heavy', 
+        ha="left",
+        transform=ax.transAxes 
     )
 
     plt.tight_layout()
@@ -256,7 +275,7 @@ def viz_externo(df, name, subtitle):
 
     # Create the barplot for monthly data with adjusted width
     palette = ['firebrick' if x < 0 else 'mediumblue' for x in df['MoM']]
-    bars = sns.barplot(x='month', y='MoM', data=df, palette=palette, legend=False, ax=ax1)
+    bars = sns.barplot(x='month', y='MoM', data=df, hue='month', palette=palette, legend=False, ax=ax1)
 
     # Adjust bar width to occupy more space horizontally
     for bar in bars.patches:
@@ -310,6 +329,15 @@ def viz_externo(df, name, subtitle):
         ha="left",
         transform=plt.gca().transAxes  
     )
+    plt.text(
+        x=0, 
+        y=1.08,  
+        s="@EconDataViz", 
+        fontsize=13,
+        fontweight='heavy', 
+        ha="left",
+        transform=plt.gca().transAxes 
+    )
 
     # Remove borders
     for spine in ax1.spines.values():
@@ -336,8 +364,9 @@ def viz_credito(df, name, subtitle):
     fig, ax = plt.subplots(figsize=figsize_inches, dpi=dpi)
 
     # Configurar o título e subtítulo do gráfico
-    fig.text(0.0, 1.05, name, fontsize=24, fontweight="bold")
-    fig.text(0.0, 1.0, f"{subtitle}. Fonte: BCB", fontsize=14)
+    fig.text(0.0, 1.1, name, fontsize=36, fontweight="heavy")
+    fig.text(0.0, 1.065, f"{subtitle}. Fonte: BCB", fontsize=14)
+    fig.text(0.0, 1.03, "@EconDataViz", fontsize=13, fontweight='heavy')
 
     # Plot 'Pessoa Física' first
     sns.barplot(data=df, x='month', y='Pessoa Física', color='skyblue', label='Pessoa Física')
@@ -374,10 +403,10 @@ def viz_credito(df, name, subtitle):
     ax.set_xticks(range(len(df)))
     ax.set_xticklabels(df['month'], fontsize=12)
     ax.set_xlabel('')
-    ax.legend(loc='upper left', bbox_to_anchor=(0, 1.15), ncol=2, frameon=False, fontsize=12)
+    ax.legend(loc='center', bbox_to_anchor=(0.5, 1.05), ncol=2, frameon=False, fontsize=12)
 
     # Ajustar o layout do gráfico
-    plt.subplots_adjust(left=0, right=1, bottom=0.1, top=1)
+    plt.subplots_adjust(left=0, right=1, top=1)
     plt.tight_layout()
     # Save the plot to a BytesIO object
     img_buffer = BytesIO()
@@ -398,8 +427,9 @@ def viz_juros(df, name, subtitle):
     fig, ax = plt.subplots(figsize=figsize_inches, dpi=dpi)
 
     # Configurar o título e subtítulo do gráfico
-    fig.text(0.0, 1.05, name, fontsize=24, fontweight="bold")
-    fig.text(0.0, 1.0, f"{subtitle}. Fonte: BCB", fontsize=14)
+    fig.text(0.0, 1.1, name, fontsize=36, fontweight="heavy")
+    fig.text(0.0, 1.06, f"{subtitle}. Fonte: BCB", fontsize=14)
+    fig.text(0.0, 1.025, "@EconDataViz", fontsize=13, fontweight='heavy')
 
     sns.lineplot(data=df, palette='Accent', dashes=False, linewidth=3, ax=ax)
 
@@ -447,8 +477,9 @@ def viz_credito_livredir(df, name, subtitle):
     fig, ax = plt.subplots(figsize=figsize_inches, dpi=dpi)
 
     # Configurar o título e subtítulo do gráfico
-    fig.text(0.0, 1.05, name, fontsize=24, fontweight="bold")
-    fig.text(0.0, 1.0, f"{subtitle}. Fonte: BCB", fontsize=14)
+    fig.text(0.0, 1.1, name, fontsize=36, fontweight="heavy")
+    fig.text(0.0, 1.065, f"{subtitle}. Fonte: BCB", fontsize=14)
+    fig.text(0.0, 1.03, "@EconDataViz", fontsize=13, fontweight='heavy')
 
     # Plot 'Livre' first
     sns.barplot(data=df, x='month', y='Livre', color='skyblue', label='Livre')
@@ -485,10 +516,10 @@ def viz_credito_livredir(df, name, subtitle):
     ax.set_xticks(range(len(df)))
     ax.set_xticklabels(df['month'], fontsize=12)
     ax.set_xlabel('')
-    ax.legend(loc='upper left', bbox_to_anchor=(0, 1.15), ncol=2, frameon=False, fontsize=12)
+    ax.legend(loc='center', bbox_to_anchor=(0.5, 1.05), ncol=2, frameon=False, fontsize=12)
 
     # Ajustar o layout do gráfico
-    plt.subplots_adjust(left=0, right=1, bottom=0.1, top=1)
+    plt.subplots_adjust(left=0, right=1, top=1)
     plt.tight_layout()
     # Save the plot to a BytesIO object
     img_buffer = BytesIO()

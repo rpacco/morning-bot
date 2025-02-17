@@ -86,6 +86,15 @@ def gen_graph(df, combustivel):
         ha="left",
         transform=plt.gca().transAxes  
     )
+    plt.text(
+        x=-0.03, 
+        y=1.13,  
+        s="@EconDataViz", 
+        fontsize=13,
+        fontweight='heavy', 
+        ha="left",
+        transform=plt.gca().transAxes  
+    )
 
     # Format y-axis
     def custom_formatter(x, pos):
@@ -125,7 +134,7 @@ def gen_graph(df, combustivel):
         mlines.Line2D([], [], color='green' if df['year_ma'].iloc[-1] >= 0 else 'salmon', linewidth=1.5, label='Média anual'),
         Rectangle((0, 0), 1, 1, facecolor='red', edgecolor='red', label='Zona de reajuste', alpha=0.3)
     ]
-    plt.legend(handles=legend_handles, loc='center', bbox_to_anchor=(0.5, 1.1), ncol=3, frameon=False, prop={'size': 14})
+    plt.legend(handles=legend_handles, loc='center', bbox_to_anchor=(0.5, 1.08), ncol=3, frameon=False, prop={'size': 14})
 
     # Remove borders
     ax.spines['top'].set_visible(False)

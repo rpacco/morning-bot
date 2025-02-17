@@ -50,6 +50,15 @@ def chart_viz(df, name, subtitle, logger: gcp_logging.Logger):
             ha="left",
             transform=fig.transFigure  
         )
+        plt.text(
+            x=-0.03, 
+            y=0.965,  
+            s="@EconDataViz", 
+            fontsize=13,
+            fontweight='heavy', 
+            ha="left",
+            transform=fig.transFigure 
+        )
         plt.ylabel('')
 
         ax.spines['top'].set_visible(False)
