@@ -64,6 +64,15 @@ def gen_chart(df, name, subtitle):
         ha="left",
         transform=plt.gca().transAxes  
     )
+    plt.text(
+        x=0, 
+        y=1.08,  
+        s="@EconDataViz", 
+        fontsize=13, 
+        fontweight='heavy',
+        ha="left",
+        transform=plt.gca().transAxes  
+    )
 
     # Remove borders
     ax.spines['top'].set_visible(False)
