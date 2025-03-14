@@ -14,3 +14,4 @@ lxml
 matplotlib
 numpy
 db-dtypes
+python-bcb
