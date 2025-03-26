@@ -39,8 +39,8 @@
     },
     {
       "evento": "Estatísticas do setor externo",
-      "category": "Transações correntes",
-      "subtitle": "Saldo mensal (em bilhões de US$)",
+      "category": "Balanço de Pagamentos",
+      "subtitle": "Transações correntes, saldo mensal (em bilhões de US$)",
       "series": [
         22701,
         24419
@@ -49,10 +49,10 @@
         "MoM",
         "YoY"
       ],
-      "multiplicador": 1,
+      "multiplicador": 0.001,
       "raw": false,
-      "chart": "viz_externo",
-      "text": "text_fiscais"
+      "chart": "viz_correntes",
+      "text": "text_correntes"
     },
     {
       "evento": "Estatísticas do setor externo",
@@ -66,10 +66,10 @@
         "MoM",
         "YoY"
       ],
-      "multiplicador": 1,
+      "multiplicador": 0.001,
       "raw": false,
       "chart": "viz_externo",
-      "text": "text_fiscais"
+      "text": "text_correntes"
     },
     {
       "evento": "Estatísticas monetárias e de crédito",

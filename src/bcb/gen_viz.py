@@ -282,7 +282,7 @@ def viz_externo(df, name, subtitle):
         bar.set_width(0.85)  # Width of each bar, adjust as needed (0 to 1)
 
     # Define tolerance for considering a value as zero
-    tolerance = 1e1
+    tolerance = 1e-2
 
     # Annotate the barplot, handling zero explicitly with tolerance
     for bar in bars.patches:
@@ -292,7 +292,7 @@ def viz_externo(df, name, subtitle):
         if abs(height) < tolerance:  # Check if height is effectively zero
             formatted_height = '0.00'
         else:
-            formatted_height = f'{height/1000:.2f}'
+            formatted_height = f'{height:.2f}'
         
         ax1.text(x_pos, height, formatted_height, 
                  ha='center', va='bottom' if height >= 0 else 'top', color='black', fontsize=11, fontweight='bold')
@@ -520,6 +520,99 @@ def viz_credito_livredir(df, name, subtitle):
 
     # Ajustar o layout do gráfico
     plt.subplots_adjust(left=0, right=1, top=1)
+    plt.tight_layout()
+    # Save the plot to a BytesIO object
+    img_buffer = BytesIO()
+    plt.savefig(img_buffer, format='jpg', bbox_inches='tight')
+    img_buffer.seek(0)  # Move the cursor to the beginning of the BytesIO object
+
+    # Return the BytesIO object
+    return img_buffer
+
+
+def viz_correntes(df, name, subtitle):
+    df = df.iloc[-24:,].copy()
+    df['month'] = df.index.strftime('%b/%y')
+    
+    dpi = 100
+    figsize_inches = (1024 / dpi, 762 / dpi)  
+
+    # Set up the matplotlib figure
+    fig, ax1 = plt.subplots(figsize=figsize_inches, dpi=dpi)
+
+    # Adjust the plot margins to use all available space
+    plt.subplots_adjust(left=0.05, right=0.95, top=0.85, bottom=0.2)
+
+    # Create the barplot for monthly data with adjusted width
+    palette = ['firebrick' if x < 0 else 'mediumblue' for x in df['MoM']]
+    bars = sns.barplot(x='month', y='MoM', data=df, hue='month', palette=palette, legend=False, ax=ax1)
+
+    # Adjust bar width to occupy more space horizontally
+    for bar in bars.patches:
+        bar.set_width(0.85)  # Width of each bar, adjust as needed (0 to 1)
+
+    # Define tolerance for considering a value as zero
+    tolerance = 1e-2
+
+    # Annotate the barplot, handling zero explicitly with tolerance
+    for bar in bars.patches:
+        height = bar.get_height()
+        x_pos = bar.get_x() + bar.get_width() / 2
+        
+        if abs(height) < tolerance:  # Check if height is effectively zero
+            formatted_height = '0.00'
+        else:
+            formatted_height = f'{height:.2f}'
+        
+        ax1.text(x_pos, height, formatted_height, 
+                 ha='center', va='bottom' if height >= 0 else 'top', color='black', fontsize=11, fontweight='bold')
+
+    # Remove y-axis labels and ticks, and adjust plot to use the space
+    ax1.yaxis.set_visible(False)
+    ax1.set_ylabel('', labelpad=-50)  # This pushes the plot to the left
+
+    # Rotate x-axis labels by 30 degrees
+    for tick in ax1.get_xticklabels():
+        tick.set_rotation(30)
+        tick.set_ha('center')  # Center-align the label text
+        tick.set_fontsize(12)  # Increase the font size of xticklabels
+
+    # Adjust x-axis to start at the first bar
+    ax1.set_xlim(-0.5, len(df) - 0.5)
+    ax1.set_xlabel('')
+
+    # Add title and subtitle
+    plt.text(
+        x=0.0, 
+        y=1.2,  
+        s=f"{name}", 
+        fontsize=40, 
+        fontweight="bold",
+        ha="left",
+        transform=plt.gca().transAxes  
+    )
+    plt.text(
+        x=0.0, 
+        y=1.13,  
+        s=f"{subtitle}. Fonte: BCB", 
+        fontsize=18, 
+        ha="left",
+        transform=plt.gca().transAxes  
+    )
+    plt.text(
+        x=0, 
+        y=1.08,  
+        s="@EconDataViz", 
+        fontsize=13,
+        fontweight='heavy', 
+        ha="left",
+        transform=plt.gca().transAxes 
+    )
+
+    # Remove borders
+    for spine in ax1.spines.values():
+        spine.set_visible(False)
+    
     plt.tight_layout()
     # Save the plot to a BytesIO object
     img_buffer = BytesIO()

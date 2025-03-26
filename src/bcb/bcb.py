@@ -1,11 +1,12 @@
 from datetime import datetime
-from bcb import sgs
+from bcb.sgs import get as sgs_get
+import pandas as pd
 
 
 def get_bc_serie(series: list, name: str, colunas: list, reference: datetime.date, raw: bool = False, multiplicador: int = 1):
     dict_codes = dict(zip(colunas, series))
     try:
-        df_merged = sgs.get(codes=dict_codes)
+        df_merged = sgs_get(codes=dict_codes)
         df_merged.rename_axis('data', axis='index', inplace=True)
     except Exception as e:
         print(f"Error for series: {e}")

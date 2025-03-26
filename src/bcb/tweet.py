@@ -155,6 +155,31 @@ def text_credito_livredir(df, name):
     return tweet
 
 
+def text_correntes(df, name):
+    ultima_data = df.index[-1].strftime('%m/%Y')
+    mom = df['MoM'].iloc[-1]
+    yoy = df['YoY'].iloc[-1]
+
+    if mom > 0:
+        mom_str = f'+R${mom:.2f} bi'
+    else:
+        mom_str = f'-R${abs(mom):.2f} bi'
+
+    if yoy > 0:
+        yoy_str = f'+R${yoy:.2f} bi'
+    else:
+        yoy_str = f'-R${abs(yoy):.2f} bi'
+
+    tweet = (
+        f'📊💵 {name}, referência {ultima_data}:\n\n'
+        f'-Saldo mensal: {mom_str}\n'
+        f'-Saldo em 12 meses: {yoy_str}\n'
+        f'Fonte: @BancoCentralBR'
+    )
+    
+    return tweet
+
+
 def create_tweet(text, image_path, image_buffer):
     # Retrieve environment variables
     consumer_key = os.environ.get("CONSUMER_KEY")
