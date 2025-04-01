@@ -46,8 +46,8 @@ def get_data(ano: str, tipo: str, grupo: str):
 
 
 def wrangle_data():
-    estado_df = pd.concat([get_data(str(year), 'ESTADO', '0') for year in range(2022, int(datetime.today().date().year))], axis=0)
-    capital_df = pd.concat([get_data(str(year), 'REGIÃO', '1') for year in range(2022, int(datetime.today().date().year))], axis=0)
+    estado_df = pd.concat([get_data(str(year), 'ESTADO', '0') for year in range(2022, int(datetime.today().date().year) + 1)], axis=0)
+    capital_df = pd.concat([get_data(str(year), 'REGIÃO', '1') for year in range(2022, int(datetime.today().date().year) + 1)], axis=0)
 
     merged_df = estado_df.merge(capital_df, on='date', suffixes=['_estado', '_capital'])
     merged_df.columns = [col.split('_')[-1] for col in merged_df.columns]
