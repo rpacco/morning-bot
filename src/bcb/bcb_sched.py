@@ -26,7 +26,8 @@ def bcb_calendar(arg, logger = None):
         'Boletim Regional', 'Eventos no Banco Central', 'Estatísticas do Valores a Receber', 'Focus', 
         'Indicadores', 'Informações ao Banco Central', 'Notas para a imprensa', 'Ranking de Reclamações',
         'Relatório de Economia Bancária', 'Relatório de Inflação', 'Reuniões do CMN e COMOC',
-        'Reuniões do Comef', 'Reuniões do Copom', 'Reuniões do Coremec', 'Reuniões do GRC' 
+        'Reuniões do Comef', 'Reuniões do Copom', 'Reuniões do Coremec', 'Reuniões do GRC',
+        'Índice de atividade econômica (IBC-Br)'
     ]
     today = datetime.today()
     dict_arg = {
@@ -91,6 +92,7 @@ def bcb_calendar(arg, logger = None):
     cambial_df.set_index('dataEvento', inplace=True)
     df = pd.concat([df, cambial_df])
     df.sort_index(inplace=True)
+    print(df)
 
     try:
         df = df.loc[f'{today.date()}']
@@ -106,3 +108,7 @@ def bcb_calendar(arg, logger = None):
     except:
         logger.log_text(f"No data scheduled for {today.date()}", severity="INFO")
         return None
+
+
+if __name__ == '__main__':
+    bcb_calendar('mes')
