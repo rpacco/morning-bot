@@ -1,4 +1,6 @@
 import pandas as pd
+import os
+from src.fgv_ibre.client_login import FGVPortalClient
 from src.fgv_ibre.fgv_ibre import FGVSpider
 from src.fgv_ibre.fgv_sched import run_crawler
 from src.fgv_ibre.gen_viz import chart_viz
@@ -38,7 +40,11 @@ def run_fgv_scheduler(logger, logs_df):
 
         logger.log_text(f"Running FGVSpider for {title} at {sched_time}", severity="INFO")
         try:
-            spider = FGVSpider(serie=codes, columns=ct_titles, logger=logger, ref_date=ref_date)
+            fgv_user = os.environ.get("FGV_USER")
+            fgv_password = os.environ.get("FGV_PASSWORD")
+            fgv_portal = FGVPortalClient(gcp_logging_client=logger)
+            client = fgv_portal.login(fgv_user, fgv_password)
+            spider = FGVSpider(client=client, serie=codes, columns=ct_titles, logger=logger, ref_date=ref_date)
             result_df = spider.run()
             if result_df is None or result_df.empty:
                 logger.log_text(f"Spider returned no data for {title}", severity="WARNING")

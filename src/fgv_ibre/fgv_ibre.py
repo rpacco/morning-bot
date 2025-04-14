@@ -1,3 +1,4 @@
+from client_login import FGVPortalClient
 import httpx
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -5,7 +6,12 @@ from google.cloud import logging as gcp_logging
 import io
 
 class FGVSpider:
-    def __init__(self, serie=None, columns=None, logger=None, ref_date=None):
+    def __init__(self, client=None, serie=None, columns=None, logger=None, ref_date=None):
+        """
+        Modificação do construtor para aceitar o client já autenticado como parâmetro.
+        """
+        self.client = client  # Agora recebemos o client já autenticado
+        self.base_url = "https://extra-ibre.fgv.br/IBRE/sitefgvdados/default.aspx"
         self.serie = serie
         self.result_df = pd.DataFrame()
         self.columns = columns
@@ -18,26 +24,18 @@ class FGVSpider:
             self.logger = logger
         self.logger.log_text(f"Spider initialized with serie: {self.serie} and columns: {self.columns}", severity="INFO")
 
-    def _get_client(self):
-        try:
-            self.logger.log_text("Getting HTTP client", severity="DEBUG")
-            return httpx.Client(follow_redirects=True, http2=True, verify=True)
-        except Exception as e:
-            self.logger.log_text(f"Failed to get HTTP client: {str(e)}", severity="ERROR")
-            return None
-
-    def _get_initial_page(self, client):
+    def _get_initial_page(self):
         try:
             self.logger.log_text("Getting initial page", severity="DEBUG")
-            base_url = "https://extra-ibre.fgv.br/ibre/sitefgvdados/default.aspx?Convidado=S"
-            response = client.get(base_url)
+            # Aqui estamos fazendo o "refresh" da página utilizando a URL já logada
+            response = self.client.get(self.base_url)  # Usando a base_url que foi configurada
             self.logger.log_text(f"Initial page response status code: {response.status_code}", severity="DEBUG")
             return response
         except Exception as e:
             self.logger.log_text(f"Failed to get initial page: {str(e)}", severity="ERROR")
             return None
 
-    def _parse_initial_page(self, client, response):
+    def _parse_initial_page(self, response):
         try:
             self.logger.log_text("Parsing initial page", severity="DEBUG")
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -46,12 +44,12 @@ class FGVSpider:
             for i in range(len(self.serie)):
                 form_data[f"ctl00$cphConsulta$dlsSerie$ctl0{i}$chkSerieEscolhida"] = "on"
             self.logger.log_text("Posting form data to initial page", severity="DEBUG")
-            return self._post_form(client, response.url, form_data)
+            return self._post_form(response.url, form_data)
         except Exception as e:
             self.logger.log_text(f"Failed to parse initial page: {str(e)}", severity="ERROR")
             return None
 
-    def _parse_step2_page(self, client, response):
+    def _parse_step2_page(self, response):
         try:
             self.logger.log_text("Parsing step 2 page", severity="DEBUG")
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -61,12 +59,12 @@ class FGVSpider:
                 form_data[f"ctl00$cphConsulta$dlsSerie$ctl0{i}$chkSerieEscolhida"] = "on"
                 form_data[f"ctl00$dlsSerie$ctl0{i}$chkSerieEscolhida"] = "on"
             self.logger.log_text("Posting form data to step 2 page", severity="DEBUG")
-            return self._post_form(client, response.url, form_data)
+            return self._post_form(response.url, form_data)
         except Exception as e:
             self.logger.log_text(f"Failed to parse step 2 page: {str(e)}", severity="ERROR")
             return None
 
-    def _parse_step3_page(self, client, response):
+    def _parse_step3_page(self, response):
         try:
             self.logger.log_text("Parsing step 3 page", severity="DEBUG")
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -78,12 +76,12 @@ class FGVSpider:
             form_data["ctl00$cphConsulta$butVisualizarResultado"] = "Visualizar e salvar"
             form_data["ctl00$txtBuscarSeries"] = ""
             self.logger.log_text("Posting form data to step 3 page", severity="DEBUG")
-            return self._post_form(client, response.url, form_data)
+            return self._post_form(response.url, form_data)
         except Exception as e:
             self.logger.log_text(f"Failed to parse step 3 page: {str(e)}", severity="ERROR")
             return None
 
-    def _parse_results(self, client, response):
+    def _parse_results(self, response):
         try:
             self.logger.log_text("Parsing results page", severity="DEBUG")
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -91,7 +89,7 @@ class FGVSpider:
             if iframe:
                 iframe_src = iframe.get('src')
                 self.logger.log_text("Getting iframe content", severity="DEBUG")
-                return client.get(f"https://extra-ibre.fgv.br{iframe_src}")
+                return self.client.get(f"https://extra-ibre.fgv.br{iframe_src}")
         except Exception as e:
             self.logger.log_text(f"Failed to parse results page: {str(e)}", severity="ERROR")
             return None
@@ -226,10 +224,10 @@ class FGVSpider:
             self.logger.log_text(f"Failed to get step 3 form data: {str(e)}", severity="ERROR")
             return None
 
-    def _post_form(self, client, url, form_data):
+    def _post_form(self, url, form_data):
         try:
             self.logger.log_text("Posting form data", severity="DEBUG")
-            response = client.post(url, data=form_data)
+            response = self.client.post(url, data=form_data)
             self.logger.log_text(f"Form post response status code: {response.status_code}", severity="DEBUG")
             return response
         except Exception as e:
@@ -238,32 +236,28 @@ class FGVSpider:
 
     def run(self):
         self.logger.log_text("Running spider", severity="INFO")
-        client = self._get_client()
-        if client is None:
-            self.logger.log_text("Failed to get HTTP client", severity="ERROR")
-            return
 
-        response = self._get_initial_page(client)
+        response = self._get_initial_page()
         if response is None:
             self.logger.log_text("Failed to get initial page", severity="ERROR")
             return
 
-        response = self._parse_initial_page(client, response)
+        response = self._parse_initial_page(response)
         if response is None:
             self.logger.log_text("Failed to parse initial page", severity="ERROR")
             return
 
-        response = self._parse_step2_page(client, response)
+        response = self._parse_step2_page(response)
         if response is None:
             self.logger.log_text("Failed to parse step 2 page", severity="ERROR")
             return
 
-        response = self._parse_step3_page(client, response)
+        response = self._parse_step3_page(response)
         if response is None:
             self.logger.log_text("Failed to parse step 3 page", severity="ERROR")
             return
 
-        response = self._parse_results(client, response)
+        response = self._parse_results(response)
         if response is None:
             self.logger.log_text("Failed to parse results page", severity="ERROR")
             return
