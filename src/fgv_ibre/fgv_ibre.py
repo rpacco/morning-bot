@@ -1,4 +1,4 @@
-from client_login import FGVPortalClient
+from .client_login import FGVPortalClient
 import httpx
 import pandas as pd
 from bs4 import BeautifulSoup
