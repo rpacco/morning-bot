@@ -3,23 +3,30 @@ import os
 import pandas as pd
 
 def gen_text(df, title, emojis):
-    tweet_text = f'{emojis} {title}, referência {df.index[-1].date().strftime("%m-%Y")}:\n\n'
+    # Última data da série
+    ref_date = df.index[-1].strftime("%m-%Y")
+    tweet = f"{emojis} {title} ({ref_date})\n"
+
+    # Variações
     var_mom = df.pct_change(1).iloc[-1]
     var_yoy = (df.rolling(12).sum() / df.shift(12).rolling(12).sum() - 1).iloc[-1]
-    df_merged = pd.concat([var_mom, var_yoy], axis=1).T
-    df_merged.index = ['MoM', 'YoY']
-    for col in df_merged.columns:
-        tweet_text += f'-{col}:'
-        for index, value in df_merged[col].items():
-            tweet_text += (
-                f' {value:.2%} {index};'
-                f''
-                )
-        tweet_text += '\n'
-    
-    tweet_text += "\nFonte: @FGVIBRE"
 
-    return tweet_text
+    # Função para emoji de tendência
+    def trend_emoji(val):
+        return "📈" if val > 0 else "📉" if val < 0 else "➡️"
+
+    # Monta o texto linha por linha
+    for col in df.columns:
+        mom = var_mom[col]
+        yoy = var_yoy[col]
+        tweet += (
+            f"\n{col}:\n"
+            f"• MoM: {mom:+.1%} {trend_emoji(mom)}\n"
+            f"• YoY: {yoy:+.1%} {trend_emoji(yoy)}\n"
+        )
+
+    tweet += "\nFonte: @FGVIBRE"
+    return tweet
 
 def create_tweet(text, image_path, image_buffer):
     # Retrieve environment variables
