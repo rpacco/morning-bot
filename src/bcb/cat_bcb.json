@@ -73,6 +73,21 @@
     },
     {
       "evento": "Estatísticas monetárias e de crédito",
+      "category": "Agregados Monetários - M2",
+      "subtitle": "ao fim de cada ano (em trilhões de R$)",
+      "series": [
+        27810
+      ],
+      "colunas": [
+        "MoM"
+      ],
+      "multiplicador": 0.001,
+      "raw": false,
+      "chart": "viz_m2",
+      "text": "text_m2"
+    },
+    {
+      "evento": "Estatísticas monetárias e de crédito",
       "category": "Créditos do sistema financeiro",
       "subtitle": "Saldo (em bilhões de R$)",
       "series": [

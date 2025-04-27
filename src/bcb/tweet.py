@@ -1,5 +1,6 @@
 import tweepy
 import os
+import pandas as pd
 
 
 def text_juros(df, name):
@@ -176,6 +177,67 @@ def text_correntes(df, name):
         f'-Saldo em 12 meses: {yoy_str}\n'
         f'Fonte: @BancoCentralBR'
     )
+    
+    return tweet
+
+def text_m2(df, name):
+    """
+    Gera um tweet com variações do M2:
+    - Variação mensal (MoM)
+    - Variação anual (YoY)
+    - Variação desde 2022
+    - Variação desde 2019
+    
+    :param df: DataFrame com índice de datas e coluna única de valores M2
+    :return: String formatada para tweet
+    """
+    
+    # Garantir que o índice seja datetime e ordenar
+    df.index = pd.to_datetime(df.index)
+    df = df.sort_index()
+    
+    # Pegar o último valor disponível (MAIS RECENTE)
+    ultimo_valor = df.iloc[-1].values[0]
+    data_ultimo = df.index[-1].strftime('%m/%Y')
+    
+    # 1. Variação Mensal (MoM - Month over Month)
+    penultimo_valor = df.iloc[-2].values[0]
+    mom = (ultimo_valor / penultimo_valor - 1) * 100
+    
+    # 2. Variação Anual (YoY - Year over Year)
+    data_ano_passado = df.index[-1] - pd.DateOffset(years=1)
+    try:
+        valor_ano_passado = df.loc[data_ano_passado.strftime('%Y-%m-%d')].values[0]
+        yoy = (ultimo_valor / valor_ano_passado - 1) * 100
+    except (KeyError, IndexError):  # Caso não tenha exatamente 1 ano atrás
+        yoy = float('nan')
+    
+    # 3. Variação desde 2022 (primeiro dia de 2022)
+    try:
+        valor_2022 = df.loc['2022-12-01'].values[0]
+        var_desde_2022 = (ultimo_valor / valor_2022 - 1) * 100
+    except (KeyError, IndexError):
+        var_desde_2022 = float('nan')
+    
+    # 4. Variação desde 2019 (primeiro dia de 2019)
+    try:
+        valor_2019 = df.loc['2019-12-01'].values[0]
+        var_desde_2019 = (ultimo_valor / valor_2019 - 1) * 100
+    except (KeyError, IndexError):
+        var_desde_2019 = float('nan')
+    
+    # Formatação bonita para o tweet (com emojis 🚀📈💸)
+    tweet = f"📊 {name}, mês referência: {data_ultimo}\n"
+    tweet += f"💸 Total:  R$ {ultimo_valor/1e6:.2f} trilhões\n\n"
+    tweet += f"📈 **Variações:**\n"
+    tweet += f"• Mensal (MoM): {mom:+.2f}%\n"
+    tweet += f"• Anual (YoY): {yoy:+.2f}%\n"
+    tweet += f"• Desde 2022: {var_desde_2022:+.2f}%\n"
+    tweet += f"• Desde 2019: {var_desde_2019:+.2f}%\n\n"
+    tweet += "Fonte: @BancoCentralBR"
+    
+    # Tratar NaN para não ficar feio no tweet
+    tweet = tweet.replace('nan', 'N/A')
     
     return tweet
 

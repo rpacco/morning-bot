@@ -465,6 +465,69 @@ def viz_juros(df, name, subtitle):
     # Return the BytesIO object
     return img_buffer
 
+def viz_m2(df, name, subtitle):
+    # Only consider the last 61 months of data (about 5 years)
+    df = df.loc['2019':].copy()
+    last_tick = df.index[-1].strftime('%b/%Y')
+
+    df = df.resample('YE').last()
+    xticks = [tick.year for tick in df.index]
+    xticks[-1] = last_tick
+
+    dpi = 100
+    figsize_inches = (1024 / dpi, 762 / dpi)  
+
+    fig, ax = plt.subplots(figsize=figsize_inches, dpi=dpi)
+
+    # Configurar o título e subtítulo do gráfico
+    fig.text(0.0, 1.1, name, fontsize=36, fontweight="heavy")
+    fig.text(0.0, 1.06, f"{subtitle}. Fonte: BCB", fontsize=14)
+    fig.text(0.0, 1.025, "@EconDataViz", fontsize=13, fontweight='heavy')
+
+    # Reset index to make 'data' a column
+    df_reset = df.reset_index().rename(columns={'index': 'data'})
+    df_reset['data'] = pd.to_datetime(df_reset['data'])
+
+    # Plot 'MoM' against 'data'
+    ax.bar(df_reset['data'], df_reset['MoM'], width=300, color='#1f77b4')  # Width ~1 ano
+
+    # Anotações em CADA BARRA
+    for i, (date, value) in enumerate(zip(df_reset['data'], df_reset['MoM'])):
+        ax.annotate(f"{value/1e6:.2f}",  
+                    xy=(date, value), 
+                    xytext=(0, 10),  
+                    textcoords="offset points",
+                    ha='center', 
+                    fontsize=20, 
+                    fontweight='bold',
+                    color='black')
+
+    # Customize o gráfico (SEM EIXOS X e Y)
+    ax.grid(False)  
+    ax.tick_params(axis='x', which='both', length=0, labelsize=11)
+    ax.tick_params(axis='y', which='both', length=0, labelsize=0)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.set_xlabel('')
+    ax.set_yticks([])
+
+    # Ajuste dinâmico nos labels do eixo X (SEM LINHA)
+    ax.set_xticks(df_reset['data'])
+    ax.set_xticklabels(xticks, fontsize=16)
+
+    # Layout
+    plt.subplots_adjust(left=0, right=0.95, bottom=0.25, top=0.9)  
+    plt.tight_layout()
+    # Save the plot to a BytesIO object
+    img_buffer = BytesIO()
+    plt.savefig(img_buffer, format='jpg', bbox_inches='tight')
+    img_buffer.seek(0)  # Move the cursor to the beginning of the BytesIO object
+
+    # Return the BytesIO object
+    return img_buffer
+
 
 def viz_credito_livredir(df, name, subtitle):
     # Only consider the last 13 months of data
