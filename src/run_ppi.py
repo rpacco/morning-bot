@@ -1,5 +1,5 @@
 from src.abicom.ppi import PpiCrawler
-from src.abicom.gen_viz import gen_text, gen_graph, wrangle
+from src.abicom.gen_viz import gen_text, gen_graph
 from src.abicom.tweet import create_tweet
 from utils.bq_conn import get_data_from_bq_table, upsert_bq_table
 from utils.bucket_conn import update_logs_conn
@@ -53,7 +53,7 @@ def run_ppi(logger, logs_df):
                 logger.log_text("No new or updated data available.", severity="WARNING")
                 continue
 
-            df = wrangle(df_updated, comb)
+            df = df_updated.copy()
             if df.empty:
                 logger.log_text(f"No data returned for cleaning for {comb}", severity="WARNING")
                 continue
