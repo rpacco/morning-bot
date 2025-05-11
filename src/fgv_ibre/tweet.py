@@ -5,7 +5,7 @@ import pandas as pd
 def gen_text(df, title, emojis):
     # Última data da série
     ref_date = df.index[-1].strftime("%m-%Y")
-    tweet = f"{emojis} {title} ({ref_date})\n"
+    tweet = f"{emojis} {title} ({ref_date})\n\n"
 
     # Variações
     var_mom = df.pct_change(1).iloc[-1]
@@ -20,7 +20,7 @@ def gen_text(df, title, emojis):
         mom = var_mom[col]
         yoy = var_yoy[col]
         tweet += (
-            f"\n{col}:\n"
+            f"{col}:\n"
             f"• MoM: {mom:+.1%} {trend_emoji(mom)}\n"
             f"• YoY: {yoy:+.1%} {trend_emoji(yoy)}\n"
         )
