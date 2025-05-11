@@ -1,152 +1,117 @@
-import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-from matplotlib.ticker import FuncFormatter
-from datetime import datetime
-from io import BytesIO
-from adjustText import adjust_text
-from matplotlib.patches import Rectangle
+import seaborn as sns
+import numpy as np
 import matplotlib.lines as mlines
+from matplotlib.patches import Rectangle
+from matplotlib.ticker import FuncFormatter
+import matplotlib.dates as mdates
+import pandas as pd
+import io
+from datetime import datetime
 
-# Formatting y-axis labels
-def currency_formatter(x, pos):
-    return f'{x:.2f}'  # Format numbers as currency
 
-def wrangle(df: pd.DataFrame, combustivel: str):
-    df = df.dropna()
-    df['year_ma'] = round(df[combustivel].rolling(252).mean(), 2)
-    df = df[[combustivel, 'year_ma']]
+def format_date_axis():
+    """Format the date axis with a specific format and auto-locator."""
+    date_format = mdates.DateFormatter('%b-%y')
+    plt.gca().xaxis.set_major_formatter(date_format)
+    plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=15))
+    plt.xticks(size=16)
+
+
+def format_y_axis(ax):
+    """Format the y-axis labels as percentage and set gridlines."""
+    def custom_formatter(x, pos):
+        return f"-{abs(x):,.0f}%" if x < 0 else f"{x:,.0f}%"
     
-    return df
+    ax.yaxis.set_major_formatter(FuncFormatter(custom_formatter))
+    ax.grid(axis='y', linestyle='--', alpha=0.6)
 
-def filter_values(values):
-    filtered_indices = []
-    previous_indices = []
-    for index in values.index:
-        if not previous_indices or all((index - prev_index).days > 30 for prev_index in previous_indices):
-            filtered_indices.append(index)
-            previous_indices.append(index)
-    return values.loc[filtered_indices]
+    # Add gridlines every 5% on the y-axis
+    yticks = np.arange(np.floor(ax.get_ylim()[0] / 5) * 5, np.ceil(ax.get_ylim()[1] / 5) * 5 + 5, 5)
+    ax.set_yticks(yticks)
+    ax.tick_params(axis='y', labelsize=20)  # Increase the font size for y-ticks
+
+
+def add_title(ax, label_comb):
+    """Add the plot title and subtitle."""
+    ax.text(
+        x=-0.03, y=1.25, s=f"Defasagem média {label_comb}", fontsize=36, fontweight="bold", ha="left", transform=ax.transAxes
+    )
+    ax.text(
+        x=-0.03, y=1.18, s="% em relação ao PPI. Fonte: ABICOM", fontsize=16, ha="left", transform=ax.transAxes
+    )
+    ax.text(
+        x=-0.03, y=1.13, s="@EconDataViz", fontsize=13, fontweight='heavy', ha="left", transform=ax.transAxes
+    )
+
+
+def add_legend(ax):
+    """Add legend with color-coded labels."""
+    legend_handles = [
+        mlines.Line2D([], [], color='blue', linewidth=3.5, label='Defasagem diária'),
+        Rectangle((0, 0), 1, 1, facecolor='red', edgecolor='red', label='Zona de reajuste', alpha=0.3)
+    ]
+    ax.legend(handles=legend_handles, loc='center', bbox_to_anchor=(0.5, 1.08), ncol=2, frameon=False, prop={'size': 16})
+
+
+def annotate_last_value(ax, df, combustivel):
+    """Annotate the last value of the chosen 'combustivel'."""
+    last_comb_value = df[f"{combustivel}"].values[-1]
+    ax.annotate(
+        f'{last_comb_value:.0f}%', 
+        (df[f"{combustivel}"].index[-1], df[f"{combustivel}"].values[-1]), 
+        fontsize=20, 
+        color='red' if last_comb_value < 0 else 'green', 
+        weight='bold'
+    )
+
 
 def gen_graph(df, combustivel):
     label_comb = combustivel.split('_')[0].upper()
 
-    # Slice the DataFrame to exclude the last 20 rows
-    df_filtered = df.iloc[:-20]
-    # Find the 5 largest and smallest values from the filtered DataFrame
-    nlargest = df_filtered[f'{combustivel}'].nlargest(5)
-    nsmallest = df_filtered[f'{combustivel}'].nsmallest(5)
-    nlargest = filter_values(nlargest)
-    nsmallest = filter_values(nsmallest)
-
     # Create the figure
     dpi = 100
     figsize_inches = (1024 / dpi, 762 / dpi)
-    fig = plt.figure(figsize=figsize_inches, dpi=dpi)
+    fig, ax = plt.subplots(figsize=figsize_inches, dpi=dpi)
 
-    # Plot the lines
-    ax = sns.lineplot(data=df, y=f'{combustivel}', x=df.index, color='blue', linewidth=2, legend=False)
-    sns.lineplot(data=df, y='year_ma', x=df.index, color='green' if df['year_ma'].iloc[-1] >= 0 else 'salmon', linewidth=1.5, legend=False)
+    # Plot the line
+    sns.lineplot(data=df, y=f'{combustivel}', x=df.index, color='blue', linewidth=3.5, legend=False, ax=ax)
 
-    # Set y-axis limits
-    reajuste = -20
+    # Add horizontal line at y=0
+    ax.hlines(y=0, xmin=df.index[0], xmax=df.index[-1], linestyles='dashed', alpha=0.7, color='black', linewidth=3)
+
+    # Format the x and y axes
+    format_date_axis()
+    format_y_axis(ax)
+
+    # Set y-axis limits and fill between
     ymin, ymax = ax.get_ylim()
-    if ymin < reajuste:
-        ymin = ymin
-    else:
-        ymin = -22
-    ax.set_ylim(bottom=ymin, top=ymax)
-    plt.fill_between(df.index, reajuste, ymin, color='red', alpha=0.3)
+    reajuste = -20
+    ax.set_ylim(bottom=min(ymin, reajuste), top=ymax)
+    ax.fill_between(df.index, reajuste, ymin, color='red', alpha=0.3)
 
-    # Add horizontal line
-    plt.hlines(y=0, xmin=df.index[0], xmax=df.index[-1], linestyles='dashed', alpha=0.2)
-    # Format x-axis
-    date_format = mdates.DateFormatter('%b-%y')
-    plt.gca().xaxis.set_major_formatter(date_format)
-    plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=15))
-    plt.xticks(size=12)
-    plt.xlabel('')
+    # Add title and legend
+    add_title(ax, label_comb)
+    add_legend(ax)
 
-    # Add title and subtitle
-    plt.text(
-        x=-0.03, 
-        y=1.25,  
-        s=f"Defasagem média {label_comb}", 
-        fontsize=36, 
-        fontweight="bold",
-        ha="left",
-        transform=plt.gca().transAxes  
-    )
-    plt.text(
-        x=-0.03, 
-        y=1.18,  
-        s=f"% em relação ao PPI. Fonte: ABICOM", 
-        fontsize=16, 
-        ha="left",
-        transform=plt.gca().transAxes  
-    )
-    plt.text(
-        x=-0.03, 
-        y=1.13,  
-        s="@EconDataViz", 
-        fontsize=13,
-        fontweight='heavy', 
-        ha="left",
-        transform=plt.gca().transAxes  
-    )
+    # Annotate last value
+    annotate_last_value(ax, df, combustivel)
 
-    # Format y-axis
-    def custom_formatter(x, pos):
-        return f"-{abs(x):,.0f}%" if x < 0 else f"{x:,.0f}%"
-    ax.yaxis.set_major_formatter(FuncFormatter(custom_formatter))
-    plt.ylabel('')
-    plt.yticks(size=14)
-
-    # Annotate last values
-    last_comb_value = ax.annotate(
-        f'{df[f"{combustivel}"].values[-1]:.0f}%', 
-        (df[f"{combustivel}"].index[-1], df[f"{combustivel}"].values[-1]), 
-        fontsize=12, 
-        color='black', 
-        weight='bold'
-    )
-    last_ma_value = ax.annotate(
-        f'{df["year_ma"].values[-1]:.1f}%', 
-        (df["year_ma"].index[-1], df["year_ma"].values[-1]), 
-        fontsize=12, 
-        color='green' if df["year_ma"].values[-1] > 0 else 'red', 
-        weight='bold'
-    )
-    adjust_text([last_comb_value, last_ma_value], only_move={'text': 'y'})
-    last_ma_value.set_position((last_ma_value.get_position()[0] + 7, last_ma_value.get_position()[1]))
-    last_comb_value.set_position((last_comb_value.get_position()[0] + 7, last_comb_value.get_position()[1]))
-
-    # Annotate smallest and largest values
-    for value, date in zip(nsmallest.values, nsmallest.index):
-        ax.annotate(f'{value:.0f}%', (date, value), textcoords="offset points", xytext=(0, -15), ha='center', fontsize=12, color='black', weight='bold')
-    for value, date in zip(nlargest.values, nlargest.index):
-        ax.annotate(f'{value:.0f}%', (date, value), textcoords="offset points", xytext=(0, 5), ha='center', fontsize=12, color='black', weight='bold')
-
-    # Add legend
-    legend_handles = [
-        mlines.Line2D([], [], color='blue', linewidth=2, label=f'Defasagem diária'),
-        mlines.Line2D([], [], color='green' if df['year_ma'].iloc[-1] >= 0 else 'salmon', linewidth=1.5, label='Média anual'),
-        Rectangle((0, 0), 1, 1, facecolor='red', edgecolor='red', label='Zona de reajuste', alpha=0.3)
-    ]
-    plt.legend(handles=legend_handles, loc='center', bbox_to_anchor=(0.5, 1.08), ncol=3, frameon=False, prop={'size': 14})
-
-    # Remove borders
+    # Remove borders and ticks
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    # Remove ticks
-    plt.tick_params(axis='x', length=0, width=0)
-    # Set x-axis to start at y=0
+    ax.spines['left'].set_visible(False)
+
+    # Set x-axis limits
     ax.set_xlim(left=df.index[0], right=df.index[-1])
+
+    # Remove axis labels (x and y titles)
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+
     # Finalize plot
     plt.tight_layout(rect=(0, 0, 1.1, 1))
-
-    img_buffer = BytesIO()
+    img_buffer = io.BytesIO()
     plt.savefig(img_buffer, format='jpg', bbox_inches='tight')
     img_buffer.seek(0)
 
