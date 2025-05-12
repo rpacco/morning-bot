@@ -20,7 +20,7 @@ def main_run(request):
     result_bcb = run_bcb(log_posts_df, logger)
     result_abicom = run_ppi(logger, log_posts_df)
     result_anfa = run_anfa(logger, log_posts_df)
-    result_ssp = run_ssp(logger, log_posts_df, month_log_posts_df)
+    # result_ssp = run_ssp(logger, log_posts_df, month_log_posts_df)
 
     if isinstance(result_fgv, tuple):
         result_fgv = " ".join(result_fgv) if all(isinstance(item, str) for item in result_fgv) else str(result_fgv)
@@ -37,9 +37,8 @@ def main_run(request):
     if isinstance(result_anfa, tuple):
         result_anfa = " ".join(result_anfa) if all(isinstance(item, str) for item in result_anfa) else str(result_anfa)
 
-    if isinstance(result_ssp, tuple):
-        result_ssp = " ".join(result_ssp) if all(isinstance(item, str) for item in result_ssp) else str(result_ssp)
-
+    # if isinstance(result_ssp, tuple):
+    #     result_ssp = " ".join(result_ssp) if all(isinstance(item, str) for item in result_ssp) else str(result_ssp)
     
 
-    return result_fgv + "\n" + result_ibge + "\n" + result_bcb + "\n" + result_abicom + "\n" + result_anfa + "\n" + result_ssp
+    return result_fgv + "\n" + result_ibge + "\n" + result_bcb + "\n" + result_abicom + "\n" + result_anfa + "\n" #+ result_ssp
