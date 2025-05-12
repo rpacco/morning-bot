@@ -118,6 +118,8 @@ def gen_graph(df, combustivel):
     return img_buffer
 
 def gen_text(df, combustivel):
+    df['year_ma'] = df[f'{combustivel}'].dropna().rolling(252).mean()
+    df = df[[f'{combustivel}', 'year_ma']]
     today = datetime.today()
     # Define the Unicode characters for the red and green circles
     red_circle = "\U0001F534"

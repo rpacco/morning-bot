@@ -54,6 +54,7 @@ def run_ppi(logger, logs_df):
                 continue
 
             df = df_updated.copy()
+            df.to_csv('abicom_20250512.csv')
             if df.empty:
                 logger.log_text(f"No data returned for cleaning for {comb}", severity="WARNING")
                 continue
