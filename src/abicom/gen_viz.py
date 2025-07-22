@@ -15,7 +15,7 @@ def format_date_axis():
     date_format = mdates.DateFormatter('%b-%y')
     plt.gca().xaxis.set_major_formatter(date_format)
     plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=15))
-    plt.xticks(size=16)
+    plt.xticks(size=16, rotation=30)
 
 
 def format_y_axis(ax):
