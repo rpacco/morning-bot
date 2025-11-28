@@ -168,3 +168,5 @@ cython_debug/
 notebooks/
 
 *test.py
+
+.vscode/
