@@ -1,9 +1,18 @@
 from datetime import datetime
 from bcb.sgs import get as sgs_get
 import pandas as pd
+import requests
 
 
 def get_bc_serie(series: list, name: str, colunas: list, reference: datetime.date, raw: bool = False, multiplicador: int = 1):
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*"
+    })
+    original_get = requests.get
+    requests.get = session.get
+    
     dict_codes = dict(zip(colunas, series))
     try:
         df_merged = sgs_get(codes=dict_codes)
@@ -11,6 +20,8 @@ def get_bc_serie(series: list, name: str, colunas: list, reference: datetime.dat
     except Exception as e:
         print(f"Error for series: {e}")
         return None
+    finally:
+        requests.get = original_get
         
     df_merged = df_merged * multiplicador
     df_merged.name = name
