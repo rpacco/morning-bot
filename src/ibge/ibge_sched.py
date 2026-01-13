@@ -49,7 +49,7 @@ def parse_calendar_html(html: str) -> pd.DataFrame:
         return pd.DataFrame()  # Empty DataFrame if no data for today
 
 def run_crawler(logger=None, **kwargs) -> pd.DataFrame:
-    url = "https://www.ibge.gov.br/calendario-de-divulgacoes-novoportal.html"
+    url = "https://www.ibge.gov.br/calendario/mensal.html"
     html = fetch_calendar_data(url)
     df = parse_calendar_html(html)
     
