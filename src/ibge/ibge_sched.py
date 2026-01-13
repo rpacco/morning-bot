@@ -4,7 +4,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 
 def fetch_calendar_data(url: str) -> str:
-    with httpx.Client() as client:
+    with httpx.Client(follow_redirects=True) as client:
         response = client.get(url)
         response.raise_for_status()  # Ensure we got a successful response
         return response.text
